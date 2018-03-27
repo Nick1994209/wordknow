@@ -1,0 +1,2 @@
+@reboot /code/wordknow/application/run_telegram.sh
+@reboot /code/wordknow/application/run_telegram_tasks.sh
