@@ -135,7 +135,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+LOGS_PATH = os.environ.get('LOGS_PATH', 'logs')
 
 LOGGING = {
     'version': 1,
@@ -157,9 +158,21 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': './debug.log',
-            'formatter': 'simple',
-        }
+            'filename': os.path.join(LOGS_PATH, 'debug.log'),
+            'formatter': 'verbose',
+        },
+        'telegram_tasks': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_PATH, 'telegram_tasks.debug.log'),
+            'formatter': 'verbose',
+        },
+        'telegram_handlers': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_PATH, 'telegram_handlers.debug.log'),
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django': {
@@ -172,6 +185,14 @@ LOGGING = {
         },
         'app': {
             'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'telegram_tasks': {
+            'handlers': ['console', 'telegram_tasks'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'telegram_handlers': {
+            'handlers': ['console', 'telegram_handlers'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
     },

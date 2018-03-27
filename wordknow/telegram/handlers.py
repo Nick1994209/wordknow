@@ -16,7 +16,7 @@ from .utils import (
     get_learn_repeat_markup,
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('telegram_handlers')
 
 
 def start():

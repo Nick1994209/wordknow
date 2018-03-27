@@ -9,7 +9,7 @@ from .bot import bot
 
 from app.models import User, WordStatus
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('telegram_tasks')
 
 
 def start_background_tasks():
