@@ -20,7 +20,7 @@ class User(models.Model):
             (REPETITION, 'повторяет слова'),
         )
 
-    chat_id = models.CharField(max_length=100, verbose_name='ID чата в телеграме')
+    chat_id = models.CharField(max_length=100, verbose_name='ID чата в телеграме', unique=True)
     username = models.CharField(max_length=100, verbose_name='ID чата в телеграме')
     status = models.CharField(max_length=50, choices=Status.CHOICES, default=Status.FREE)
 

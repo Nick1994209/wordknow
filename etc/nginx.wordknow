@@ -1,12 +1,19 @@
-server {
-    listen 80;
+http {
+    gzip              on;
+    gzip_http_version 1.0;
+    gzip_proxied      any;
 
-    location /static/ {
-        root /app_static_files;
+    server {
+        listen 80;
+
+        location /static/ {
+            root /app_static_files;
+        }
+
+        location / {
+            include proxy_params;
+            proxy_pass unix:/code/wordknow/application/app.sock;
+        }
     }
 
-    location / {
-        include proxy_params;
-        proxy_pass http://unix:/code/wordknow/application/app.sock;
-    }
 }

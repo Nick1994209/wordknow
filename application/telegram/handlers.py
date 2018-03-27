@@ -22,16 +22,13 @@ logger = logging.getLogger('telegram_handlers')
 def start():
     logger.info('Start telegram bot')
 
-    if settings.DEBUG:
-        bot.polling(none_stop=True)
-        return
-
     while True:
         try:
             bot.polling(none_stop=True)
         except Exception as e:
-            logger.error(e)
+            logger.exception(e)
         time.sleep(5)
+        logger.info('RESTART')
 
 
 @bot.message_handler(commands=['start', Handlers.help.handler, 'go'])

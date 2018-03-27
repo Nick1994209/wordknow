@@ -23,8 +23,9 @@ def start_tasks():
         try:
             notification_users_with_repetition_time()
         except Exception as e:
-            logger.error('background tasks error', e)
+            logger.exception('background tasks error', e)
         time.sleep(30)
+        logger.info('RESTART')
 
 
 def notification_users_with_repetition_time():

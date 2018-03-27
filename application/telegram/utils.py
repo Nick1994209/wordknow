@@ -131,9 +131,13 @@ def get_learn_repeat_markup():
 
 
 def get_user(message: telebot.types.Message):
-    user, _ = User.objects.get_or_create(
-        chat_id=message.chat.id, username=message.from_user.username,
-    )
+    try:
+        user, _ = User.objects.get_or_create(
+            chat_id=message.chat.id, username=message.from_user.username,
+        )
+    except Exception as e:
+        logger.exception(e)
+        user = User.objects.get(chat_id=message.chat.id)
     return user
 
 

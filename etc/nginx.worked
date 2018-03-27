@@ -1,0 +1,12 @@
+server {
+    listen 80;
+
+    location /static/ {
+        root /app_static_files;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/code/wordknow/application/app.sock;
+    }
+}

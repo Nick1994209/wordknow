@@ -6,3 +6,4 @@ db.sqlite3
 environments.env
 logs/
 static/
+app.sock
