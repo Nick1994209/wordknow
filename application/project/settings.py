@@ -13,17 +13,15 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 from dotenv import load_dotenv
 
-
 from pathlib import Path  # python3 only
-env_path = Path('../') / 'environments.env'  # environments in main directory
-load_dotenv(dotenv_path=env_path, verbose=True)
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env_path = Path(os.path.join(BASE_DIR, '../environments.env'))  # environments in main directory
+load_dotenv(dotenv_path=env_path, verbose=True)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import pytz
 from django.utils import timezone
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -36,7 +34,6 @@ SECRET_KEY = '@zh4@xgoscsx)20c-(k#)h%@$40p#rzrx&mg$p)^4c17_9omsd'
 DEBUG = os.environ.get('DEBUG', False)
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -82,7 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
@@ -103,7 +99,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
@@ -122,7 +117,6 @@ AUTH_PASSWORD_VALIDATORS = [
     # },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
@@ -136,7 +130,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/

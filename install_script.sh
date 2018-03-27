@@ -9,6 +9,8 @@ apt-get install python3-pip python3-dev cron nginx libpq-dev postgresql postgres
 
 
 # sometimes need reinstall locales
+export LC_CTYPE="en_US.UTF-8"
+
 #dpkg-reconfigure locales
 
 echo "INSTALL REQUIREMENTS"
