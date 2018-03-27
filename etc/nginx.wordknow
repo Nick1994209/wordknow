@@ -1,0 +1,14 @@
+server {
+    listen 80;
+    server_name 0.0.0.0;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/nicking/wordknow/wordknow;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass /home/nicking/wordknow/wordknow/app.sock;
+    }
+}

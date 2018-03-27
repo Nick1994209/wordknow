@@ -6,7 +6,7 @@ After=network.target
 User=sammy
 Group=www-data
 WorkingDirectory=/home/nicking/wordknow/wordknow
-ExecStart=gunicorn --access-logfile - --workers 3 --bind unix:/home/nicking/wordknow/wordknow/myproject.sock project.wsgi:application
+ExecStart=gunicorn --access-logfile - --workers 3 --bind unix:/home/nicking/wordknow/wordknow/app.sock project.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
