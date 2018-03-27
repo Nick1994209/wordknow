@@ -13,11 +13,9 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 from dotenv import load_dotenv
 
-from pathlib import Path  # python3 only
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-env_path = Path(os.path.join(BASE_DIR, '../environments.env'))  # environments in main directory
-load_dotenv(dotenv_path=env_path, verbose=True)
+# environments in main directory
+load_dotenv(dotenv_path=os.path.join(BASE_DIR, '../environments.env'), verbose=True)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import pytz
