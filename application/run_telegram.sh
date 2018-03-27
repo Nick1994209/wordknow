@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-python3 manage.py telegram > /logs/console_telegram.logs
+cd /code/wordknow/application
+/usr/bin/python3 manage.py telegram > /logs/console_telegram.logs
