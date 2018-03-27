@@ -2,20 +2,24 @@
 echo "https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04"
 
 echo "START"
-apt-get update
+#apt-get update
+#apt-get install git
+#git clone git@github.com:Nick1994209/wordknow.git
 apt-get install python3-pip python3-dev cron nginx libpq-dev postgresql postgresql-contrib -y
 
+
+
 echo "INSTALL REQUIREMENTS"
-pip install -r wordknow/requirements.txt
+pip install -r requirements.txt
 
 echo "SETUP POSTGRES"
 add_postgres_db_with_user "wordknow_db" "wordknow" "123"
 
 # COLLECT STATIC FOR NGINX
 echo "SETUP DJANGO"
-python wordknow/manage.py makemigrations
-python wordknow/manage.py migrate
-python wordknow/manage.py collectstatic
+python application/manage.py makemigrations
+python application/manage.py migrate
+python application/manage.py collectstatic
 
 # Create an exception for port 8000 by typing; if want run 0.0.0.0:8000
 # ufw allow 8000

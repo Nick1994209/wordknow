@@ -4,11 +4,11 @@ server {
 
     location = /favicon.ico { access_log off; log_not_found off; }
     location /static/ {
-        root /home/nicking/wordknow/wordknow;
+        root /code/wordknow/application;
     }
 
     location / {
         include proxy_params;
-        proxy_pass /home/nicking/wordknow/wordknow/app.sock;
+        proxy_pass /code/wordknow/application/app.sock;
     }
 }

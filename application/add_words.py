@@ -3,7 +3,6 @@ from app.models import Word
 with open('words', 'r', encoding='utf-8') as f:
     file_data = f.read()
 file_data = file_data.replace('\t\t', '\t')
-file_data = file_data.replace('\t\t', '\t')
 for row in file_data.split('\n'):
     if not row:
         continue
