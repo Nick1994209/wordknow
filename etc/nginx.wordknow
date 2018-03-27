@@ -2,13 +2,12 @@ server {
     listen 80;
     server_name 0.0.0.0;
 
-    location = /favicon.ico { access_log off; log_not_found off; }
     location /static/ {
-        root /code/wordknow/application;
+        root /app_static_files;
     }
 
     location / {
         include proxy_params;
-        proxy_pass /code/wordknow/application/app.sock;
+        proxy_pass http://unix:/code/wordknow/application/app.sock;
     }
 }

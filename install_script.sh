@@ -8,29 +8,40 @@ echo "START"
 apt-get install python3-pip python3-dev cron nginx libpq-dev postgresql postgresql-contrib -y
 
 
+# sometimes need reinstall locales
+#dpkg-reconfigure locales
 
 echo "INSTALL REQUIREMENTS"
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 echo "SETUP POSTGRES"
 add_postgres_db_with_user "wordknow_db" "wordknow" "123"
 
-# COLLECT STATIC FOR NGINX
+cd application
+
+
+
 echo "SETUP DJANGO"
-python application/manage.py makemigrations
-python application/manage.py migrate
-python application/manage.py collectstatic
+python3 manage.py makemigrations
+python3 manage.py migrate
+# COLLECT STATIC FOR NGINX
+mkdir -p /app_static_files
+python3 manage.py collectstatic
 
 # Create an exception for port 8000 by typing; if want run 0.0.0.0:8000
 # ufw allow 8000
 # for delete ufw delete allow 8000
 
+cd ..
+
 echo "SETUP GUNICORN"
+
+# add /code/wordknow/environments.env
+
 cp etc/gunicorn.service /etc/systemd/system/gunicorn.service
 systemctl start gunicorn
 systemctl enable gunicorn
 systemctl status gunicorn
-
 journalctl -u gunicorn
 # IF gunicorn err
 # setup /etc/systemd/system/gunicorn.service and restart

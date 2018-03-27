@@ -3,10 +3,13 @@ Description=gunicorn daemon
 After=network.target
 
 [Service]
-User=sammy
-Group=www-data
 WorkingDirectory=/code/wordknow/application
-ExecStart=gunicorn --access-logfile - --workers 3 --bind unix:/code/wordknow/application/app.sock project.wsgi:application
+Restart=on-failure
+RuntimeDirectoryMode=755
+ExecStart=/usr/local/bin/gunicorn --access-logfile - --workers 3 --bind unix:/code/wordknow/application/app.sock project.wsgi:application
+User=nobody
+EnvironmentFile=/code/wordknow/environments.env
+
 
 [Install]
 WantedBy=multi-user.target

@@ -11,6 +11,13 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv
+
+
+from pathlib import Path  # python3 only
+env_path = Path('../') / 'environments.env'  # environments in main directory
+load_dotenv(dotenv_path=env_path, verbose=True)
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import pytz
@@ -26,10 +33,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '@zh4@xgoscsx)20c-(k#)h%@$40p#rzrx&mg$p)^4c17_9omsd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', False)
 
-# ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', ]
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -136,7 +142,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_FILES_BASE_DIR = os.environ.get('STATIC_FILES_BASE_DIR', '/app_static_files/')
+STATIC_ROOT = os.path.join(STATIC_FILES_BASE_DIR, 'static/')
 LOGS_PATH = os.environ.get('LOGS_PATH', 'logs')
 
 LOGGING = {
@@ -177,15 +184,15 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
         'telegram': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
         'app': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
         'telegram_tasks': {
