@@ -9,11 +9,11 @@ from app.utils import get_datetime_now
 from project import settings
 
 from .bot import bot
-from .botan import botan_tracking
+from .botan import botan_track
 from .constants import Handlers
 from .utils import (
-    choice_next_learning_word, generate_markup, get_user, guess_word, repeat_word, set_learn_word,
-    get_learn_repeat_markup,
+    choice_next_learning_word, get_learn_repeat_markup, get_user,
+    guess_word, repeat_word, set_learn_word,
 )
 
 logger = logging.getLogger('telegram_handlers')
@@ -32,7 +32,7 @@ def start():
 
 
 @bot.message_handler(commands=['start', Handlers.help.handler, 'go'])
-@botan_tracking
+@botan_track
 def start_handler(message: telebot.types.Message):
     chat_id = message.chat.id
     send_message = '''
@@ -41,14 +41,14 @@ def start_handler(message: telebot.types.Message):
     user = get_user(message)
 
     if user.status == User.Status.LEARNING:
-        send_message += '\n Вы сейчас находитесь в стадии заучивания новых слов :)'
+        send_message += '\n Сейчас вы находитесь в стадии заучивания новых слов :)'
     if user.status == User.Status.REPETITION:
-        send_message += '\n Вы сейчас находитесь в стадии повторения слов :)'
+        send_message += '\n Сейчас вы находитесь в стадии повторения слов :)'
     bot.send_message(chat_id, send_message, reply_markup=get_learn_repeat_markup())
 
 
 @bot.message_handler(commands=[Handlers.learn_words.handler])
-@botan_tracking
+@botan_track
 @atomic
 def learn_words_handler(message):
     user = get_user(message)
@@ -59,7 +59,7 @@ def learn_words_handler(message):
 
 
 @bot.message_handler(commands=[Handlers.repetition.handler])
-@botan_tracking
+@botan_track
 @atomic
 def repeat_words_handler(message):
     user = get_user(message)
@@ -78,7 +78,7 @@ def repeat_words_handler(message):
 
 
 @bot.message_handler(commands=[Handlers.stop.handler])
-@botan_tracking
+@botan_track
 @atomic
 def stop_handler(message):
     user = get_user(message)
@@ -91,12 +91,12 @@ def stop_handler(message):
 
 
 @bot.message_handler(content_types=["text"])
-@botan_tracking
+@botan_track
 @atomic
 def text_handler(message):
     user = get_user(message)
     if user.status_is_free():
-        bot.send_message(message.chat.id, 'Не понятна что вы хотите :(, ' + Handlers.help.path)
+        bot.send_message(message.chat.id, 'Не понятна :(, что вы хотите? ' + Handlers.help.path)
     elif user.status_is_learning():
         set_learn_word(message, user)
         choice_next_learning_word(user)

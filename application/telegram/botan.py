@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 # Modified for pyTelegramBotAPI (https://github.com/eternnoir/pyTelegramBotAPI/)
 # https://github.com/botanio/sdk/blob/master/botan.py
-
-
-import json
+import logging
 
 import requests
 
@@ -11,22 +9,25 @@ from project import settings
 
 TRACK_URL = 'https://api.botan.io/track'
 
+logger = logging.getLogger(__name__)
 
-# Эту функцию можно модифицировать, чтобы собирать...
-# ...именно то, что нужно (или вообще ничего)
+
 def make_json(message):
-    data = {}
-    data['message_id'] = message.message_id
-    data['from'] = {}
-    data['from']['id'] = message.from_user.id
+    data = {
+        'message_id': message.message_id,
+        'from': {
+            'id': message.from_user.id,
+        },
+        'chat': {
+            'id': message.chat.id,
+        },
+    }
     if message.from_user.username is not None:
         data['from']['username'] = message.from_user.username
-    data['chat'] = {}
-    # Chat.Id используется в обоих типах чатов
-    data['chat']['id'] = message.chat.id
     return data
 
 
+# add retrying
 def track(token, uid, message, name='Message'):
     try:
         r = requests.post(
@@ -37,16 +38,16 @@ def track(token, uid, message, name='Message'):
         )
         return r.json()
     except requests.exceptions.Timeout:
-        # set up for a retry, or continue in a retry loop
         return False
     except (requests.exceptions.RequestException, ValueError) as e:
-        # catastrophic error
-        print(e)
+        logger.exception('botan exception: %s', e)
         return False
 
 
-def botan_tracking(func):
+def botan_track(func):
     def wrap(message):
         func(message)
-        track(settings.BOTAN_API_KEY, message.chat.id, message, func.__name__)
+        if settings.BOTAN_API_KEY:
+            track(settings.BOTAN_API_KEY, message.chat.id, message, func.__name__)
+        logger.info('Handler: %s chat_id: %d text: %s', func.__name__, message.chat.id, message.text)
     return wrap

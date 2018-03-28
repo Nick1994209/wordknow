@@ -3,7 +3,7 @@ from random import choice as random_choice
 
 import telebot
 
-from app.models import User, WordStatus, LearningStatus
+from app.models import LearningStatus, User, WordStatus
 from app.utils import get_datetime_now
 
 from .bot import bot
@@ -26,7 +26,10 @@ def choice_next_learning_word(user: User):
 
     word = learning_status.next_learn_word
     if not word:
-        bot.send_message(user.chat_id, get_success_text() + ' Вы изучили все слова!')
+        bot.send_message(
+            user.chat_id,
+            get_success_text() + ' Вы изучили все слова! Можно добавить еще слова для изучения!',
+        )
         user.update_status(User.Status.FREE)
         bot.send_message(user.chat_id, 'Не хотите повторить изученное? /learning_status')
         return
@@ -78,6 +81,7 @@ def repeat_word(user: User, start_repetition=False):
     next_repeat_words = sorted(next_repeat_words, key=lambda x: x.id)
     if not next_repeat_words:
         user.update_status(User.Status.FREE)
+        user.learning_status.update_notification_time(None)
         bot.send_message(
             user.chat_id,
             'My congratulations! Вы повторили все слова',
@@ -96,9 +100,6 @@ def set_complete_repetition_words(learning_status: LearningStatus):
     for word_status in learning_status.repeat_words.all():
         word_status.set_next_repetition_time(now)
     learning_status.repeat_words.clear()
-    # learning_status.repeat_words.all().clear()
-    # LearningStatus.repeat_words.through.objects.filter(
-    #     learning_status_id=learning_status.pk).delete()
 
 
 def guess_word(message: telebot.types.Message, user: User) -> bool:

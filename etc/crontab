@@ -1,2 +1,5 @@
-@reboot /code/wordknow/application/run_telegram.sh
-@reboot /code/wordknow/application/run_telegram_tasks.sh
+MANAGE_PY_COMMAND='/usr/bin/python3 /code/wordknow/application/manage.py'
+
+@reboot $MANAGE_PY_COMMAND telegram >> /logs/cron_telegram
+*/5 * * * * $MANAGE_PY_COMMAND telegram_tasks notify_repetition >> /logs/cron_notify_repetition
+* */5 * * * $MANAGE_PY_COMMAND telegram_tasks notify_learning >> /logs/cron_notify_learning

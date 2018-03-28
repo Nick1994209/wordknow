@@ -89,7 +89,6 @@ class WordStatus(models.Model):
 
     def set_next_repetition_time(self, from_time):
         times = {
-            0: timedelta(seconds=0),
             1: timedelta(hours=1),
             2: timedelta(hours=6),
             3: timedelta(days=1),
@@ -98,8 +97,8 @@ class WordStatus(models.Model):
             6: timedelta(days=120),
         }
         default_delta = timedelta(days=3 * 120)
-        self.start_repetition_time = from_time + times.get(self.count_repetitions, default_delta)
         self.count_repetitions += 1
+        self.start_repetition_time = from_time + times.get(self.count_repetitions, default_delta)
         self.save(update_fields=('count_repetitions', 'start_repetition_time'))
 
 

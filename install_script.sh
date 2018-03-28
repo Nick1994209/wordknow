@@ -58,6 +58,19 @@ systemctl restart nginx
 ufw allow 'Nginx Full'
 # for nginx logs tail -F /var/log/nginx/error.log
 
+
+echo "SETUP CRON"
+#show cron logs
+#grep CRON /var/log/syslog
+crontab -e
+set from etc/crontab
+
+# cat /var/spool/cron/crontabs/root
+#chown root:root /var/spool/cron/crontabs/root
+# chmod 600 /var/spool/cron/crontabs/root
+
+
+
 # ------------ utils --------------
 function add_postgres_db_with_user {
     database=$1;
