@@ -11,7 +11,11 @@ logger = logging.getLogger('telegram_tasks')
 
 
 def notify_repetition():
-    logger.info('start notify_repetition')
+    logger.info('Start notify_repetition')
+
+    if not can_run_task():
+        logger.info('End (time) notify_repetition')
+        return
 
     now = get_datetime_now()
     users = User.objects.filter(
@@ -31,16 +35,14 @@ def notify_repetition():
         )
         user.learningstatus.update_notification_time(get_datetime_now())
 
-    logger.info('end notify_repetition')
+    logger.info('End notify_repetition')
 
 
 def notify_learning():
-    logger.info('start notify_learning')
+    logger.info('Start notify_learning')
 
-    now = get_datetime_now()
-    hours_from, hours_to = 10, 22
-    if not (hours_from <= now.hour <= hours_to):
-        logger.info('My time is not got! %s', now)
+    if not can_run_task():
+        logger.info('End (time) notify_learning')
         return
 
     markup = generate_markup(Handlers.learn_words.path)
@@ -51,4 +53,17 @@ def notify_learning():
             reply_markup=markup,
         )
 
-    logger.info('end notify_learning')
+    logger.info('End notify_learning')
+
+
+def can_run_task():
+    now = get_datetime_now()
+
+    logger.info('Current time %s', now)
+
+    hours_from, hours_to = 10, 22
+    if hours_from <= now.hour <= hours_to:
+        return True
+
+    logger.info('My time is not got! %s', now)
+    return False
