@@ -29,7 +29,7 @@ def notify_repetition():
             'Hello my friend! Do you want to repetition new words?',
             reply_markup=markup,
         )
-        user.learningstatus.update_notification_time()
+        user.learningstatus.update_notification_time(get_datetime_now())
 
     logger.info('end notify_repetition')
 
