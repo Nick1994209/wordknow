@@ -10,7 +10,7 @@ from project import settings
 
 from .bot import bot
 from .botan import botan_track
-from .constants import Handlers
+from .constants import Handlers, Emogies
 from .utils import (
     choice_next_learning_word, get_learn_repeat_markup, get_user,
     guess_word, repeat_word, set_learn_word,
@@ -36,8 +36,8 @@ def start():
 def start_handler(message: telebot.types.Message):
     chat_id = message.chat.id
     send_message = '''
-        Добро пожаловать!
-    '''
+        Добро пожаловать! 
+    ''' + Emogies.astronaut
     user = get_user(message)
 
     if user.status == User.Status.LEARNING:
@@ -53,7 +53,7 @@ def start_handler(message: telebot.types.Message):
 def learn_words_handler(message):
     user = get_user(message)
     user.update_status(User.Status.LEARNING)
-    bot.send_message(message.chat.id, 'Изучать слова это здоворо! Приступим!')
+    bot.send_message(message.chat.id, 'Изучать слова это здоворо! Приступим!' + Emogies.astronaut)
     user.learning_status.repeat_words.clear()
     choice_next_learning_word(user)
 
@@ -96,7 +96,7 @@ def stop_handler(message):
 def text_handler(message):
     user = get_user(message)
     if user.status_is_free():
-        bot.send_message(message.chat.id, 'Не понятна :(, что вы хотите? ' + Handlers.help.path)
+        bot.send_message(message.chat.id, 'Не понятна :( что вы хотите? ' + Handlers.help.path)
     elif user.status_is_learning():
         set_learn_word(message, user)
         choice_next_learning_word(user)

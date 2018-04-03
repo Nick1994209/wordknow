@@ -7,7 +7,7 @@ from app.models import LearningStatus, User, WordStatus
 from app.utils import get_datetime_now
 
 from .bot import bot
-from .constants import Commands, Handlers
+from .constants import Commands, Handlers, Emogies
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ def choice_next_learning_word(user: User):
     # набрали слов. Пора заканчивать
     if learning_status.count_words <= len(learning_status.repeat_words.all()):
         user.update_status(User.Status.FREE)
-        message = 'Отлично! Самое время повторить слова!'
+        message = '%s Отлично! Самое время повторить слова! %s' % (Emogies.rocket, Emogies.rocket)
         bot.send_message(
             user.chat_id, message, reply_markup=generate_markup(Handlers.repetition.path),
         )
@@ -28,10 +28,14 @@ def choice_next_learning_word(user: User):
     if not word:
         bot.send_message(
             user.chat_id,
-            get_success_text() + ' Вы изучили все слова! Можно добавить еще слова для изучения!',
+            get_success_text() +
+            ' Вы изучили все слова! Можно добавить еще слова для изучения! ' + Emogies.fearful
+            + Emogies.astonished,
         )
         user.update_status(User.Status.FREE)
-        bot.send_message(user.chat_id, 'Не хотите повторить изученное? /learning_status')
+        bot.send_message(
+            user.chat_id, 'Не хотите повторить изученное? %s /learning_status' % Emogies.astronaut,
+        )
         return
 
     bot.send_message(
@@ -59,7 +63,7 @@ def set_learn_word(message: telebot.types.Message, user: User) -> bool:
     else:
         # когда ввели не учить/пропустить
         bot.send_message(
-            user.chat_id, 'Не понятное сообщение. Вы хотите выучить слово?',
+            user.chat_id, 'Не понятное сообщение. Вы хотите выучить слово? :rocket:',
             reply_markup=generate_markup(Commands.learn, Commands.miss, Handlers.stop.path),
         )
         return False
@@ -82,9 +86,10 @@ def repeat_word(user: User, start_repetition=False):
     if not next_repeat_words:
         user.update_status(User.Status.FREE)
         user.learning_status.update_notification_time(None)
+
         bot.send_message(
             user.chat_id,
-            'My congratulations! Вы повторили все слова',
+            'My congratulations! Вы повторили все слова ' + Emogies.astronaut,
             reply_markup=get_learn_repeat_markup(),
         )
         set_complete_repetition_words(learning_status)
