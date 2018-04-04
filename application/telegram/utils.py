@@ -63,7 +63,7 @@ def set_learn_word(message: telebot.types.Message, user: User) -> bool:
     else:
         # когда ввели не учить/пропустить
         bot.send_message(
-            user.chat_id, 'Не понятное сообщение. Вы хотите выучить слово? :rocket:',
+            user.chat_id, 'Не понятное сообщение. Вы хотите выучить слово?',
             reply_markup=generate_markup(Commands.learn, Commands.miss, Handlers.stop.path),
         )
         return False
@@ -89,7 +89,7 @@ def repeat_word(user: User, start_repetition=False):
 
         bot.send_message(
             user.chat_id,
-            'My congratulations! Вы повторили все слова ' + Emogies.astronaut,
+            'My congratulations! Вы повторили все слова ' + Emogies.fearful,
             reply_markup=get_learn_repeat_markup(),
         )
         set_complete_repetition_words(learning_status)
@@ -119,7 +119,9 @@ def guess_word(message: telebot.types.Message, user: User) -> bool:
         return True
 
     repeated_word_status.increase_not_guess()
-    text = word.learn_text + '\n Повторение - мать учения! Пожалуйста, напишите translate слова'
+    text = '%s \n Повторение - мать учения! Пожалуйста, напишите translate слова %s' % (
+        word.learn_text, Emogies.astonished,
+    )
 
     bot.send_message(user.chat_id, text)
     return False
@@ -150,5 +152,6 @@ def get_user(message: telebot.types.Message):
 def get_success_text() -> str:
     texts = [
         'Огонь!', 'Вперед! В том же духе)', 'Кто у нас тут такой молодец?)', 'Ну ничоси выдаешь!',
+        'Краусава!', 'Где же вы были раньше?)', 'Не переродились еще на Руси!',
     ]
     return random_choice(texts)

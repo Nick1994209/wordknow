@@ -37,7 +37,7 @@ def start_handler(message: telebot.types.Message):
     chat_id = message.chat.id
     send_message = '''
         Добро пожаловать! 
-    ''' + Emogies.astronaut
+    ''' + Emogies.wink
     user = get_user(message)
 
     if user.status == User.Status.LEARNING:
@@ -115,7 +115,7 @@ def query_text(query):
     else:
         text = 'Words not append to db'
 
-    start_text = settings.TELEGRAM_NAME + " I'm learning words! And you? "
+    start_text = settings.TELEGRAM_NAME + " I'm learning words! And you? " + Emogies.wink
 
     single_msg = telebot.types.InlineQueryResultArticle(
         id="1", title=text[:200],
