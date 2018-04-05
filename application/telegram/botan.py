@@ -49,5 +49,25 @@ def botan_track(func):
         func(message)
         if settings.BOTAN_API_KEY:
             track(settings.BOTAN_API_KEY, message.chat.id, message, func.__name__)
-        logger.info('Handler: %s chat_id: %d text: %s', func.__name__, message.chat.id, message.text)
+
+        try:
+            logger.info(
+                'Handler: %s chat_id: %s text: %s',
+                func.__name__, str(message.chat.id), message.text,
+            )
+        except UnicodeEncodeError:
+            logger.info(
+                'Handler: %s chat_id: %s text: %s',
+                func.__name__, str(message.chat.id), safe_str(message.text),
+            )
+
     return wrap
+
+
+def safe_str(obj):
+    try:
+        return obj.encode('utf-8')
+    except UnicodeEncodeError:
+        return obj.encode('ascii', 'ignore').decode('ascii')
+    except:
+        return ""

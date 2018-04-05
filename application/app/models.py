@@ -3,12 +3,29 @@ import typing
 from datetime import timedelta
 
 from django.db import models
+from django.utils import timezone
 from django.utils.functional import cached_property
 
 logger = logging.getLogger(__name__)
 
 
-class User(models.Model):
+class CreatedUpdateBaseModel(models.Model):
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def save(self, update_fields=None, **kwargs):
+        if update_fields:
+            update_fields = set(update_fields)
+            self.date_updated = timezone.now()
+            update_fields.add('date_updated')
+            update_fields = tuple(update_fields)
+        super().save(update_fields=update_fields, **kwargs)
+
+    class Meta:
+        abstract = True
+
+
+class User(CreatedUpdateBaseModel):
     class Status:
         FREE = 'free'
         LEARNING = 'learning'
@@ -40,6 +57,7 @@ class User(models.Model):
         return status
 
     def update_status(self, status):
+        logger.info('User %s update status from %s - %s', self.username, self.status, status)
         self.status = status
         self.save(update_fields=('status',))
 
@@ -53,11 +71,9 @@ class User(models.Model):
         return self.status == self.Status.REPETITION
 
 
-class Word(models.Model):
+class Word(CreatedUpdateBaseModel):
     text = models.CharField(max_length=256)
     translate = models.CharField(max_length=256)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.text + ' - ' + self.translate
@@ -67,12 +83,10 @@ class Word(models.Model):
         return self.text + ' - ' + self.translate
 
 
-class WordStatus(models.Model):
+class WordStatus(CreatedUpdateBaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='learned_words')
     word = models.ForeignKey(Word, on_delete=models.CASCADE, related_name='learned_words')
     start_repetition_time = models.DateTimeField()
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
     count_repetitions = models.IntegerField(default=0)
     number_not_guess = models.IntegerField(default=0)
 
@@ -101,13 +115,16 @@ class WordStatus(models.Model):
         self.start_repetition_time = from_time + times.get(self.count_repetitions, default_delta)
         self.save(update_fields=('count_repetitions', 'start_repetition_time'))
 
+        logger.info(
+            'WordStatus %d %s update status count_repetitions=%d time=%s',
+            self.user_id, self.word.text, self.start_repetition_time,
+        )
 
-class LearningStatus(models.Model):
+
+class LearningStatus(CreatedUpdateBaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     repeat_words = models.ManyToManyField(WordStatus)
     number_not_guess = models.IntegerField(default=0)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
     count_words = models.IntegerField(default=5)
 
     repetition_word_status = models.ForeignKey(
@@ -142,6 +159,10 @@ class LearningStatus(models.Model):
         return word_statuses[0]
 
     def set_repetition_word_status_id(self, word_status_id):
+        logger.info(
+            'LearningStatus %d update repetition_word_status_id %d',
+            self.user_id, word_status_id,
+        )
         self.repetition_word_status_id = word_status_id
         self.save(update_fields=('repetition_word_status_id',))
 
@@ -152,10 +173,19 @@ class LearningStatus(models.Model):
 
     def set_next_learn_word(self):
         word = self.next_learn_word
+        logger.info(
+            'LearningStatus %d update next_learn_word: current=%d next=%d',
+            self.user_id, self.learn_word_id, word.id,
+        )
+
         self.learn_word_id = word.id
         self.learn_word = word
         self.save(update_fields=('learn_word_id',))
 
     def update_notification_time(self, set_time=None):
+        logger.info(
+            'LearningStatus %d update notification_time: %s',
+            self.user_id, set_time,
+        )
         self.repetition_notified = set_time
         self.save(update_fields=('repetition_notified', ))
