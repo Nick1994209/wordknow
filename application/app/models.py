@@ -116,8 +116,8 @@ class WordStatus(CreatedUpdateBaseModel):
         self.save(update_fields=('count_repetitions', 'start_repetition_time'))
 
         logger.info(
-            'WordStatus %d %s update status count_repetitions=%d time=%s',
-            self.user_id, self.word.text, self.start_repetition_time,
+            'WordStatus %d %s update count_repetitions=%d time=%s',
+            self.user_id, self.word.text, self.count_repetitions, self.start_repetition_time,
         )
 
 

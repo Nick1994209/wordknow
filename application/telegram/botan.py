@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf8
 # Modified for pyTelegramBotAPI (https://github.com/eternnoir/pyTelegramBotAPI/)
 # https://github.com/botanio/sdk/blob/master/botan.py
 import logging
@@ -49,17 +49,10 @@ def botan_track(func):
         func(message)
         if settings.BOTAN_API_KEY:
             track(settings.BOTAN_API_KEY, message.chat.id, message, func.__name__)
-
-        try:
-            logger.info(
-                'Handler: %s chat_id: %s text: %s',
-                func.__name__, str(message.chat.id), message.text,
-            )
-        except UnicodeEncodeError:
-            logger.info(
-                'Handler: %s chat_id: %s text: %s',
-                func.__name__, str(message.chat.id), safe_str(message.text),
-            )
+        logger.info(
+            'Handler: %s chat_id: %s text: %s',
+            func.__name__, str(message.chat.id), message.text,
+        )
 
     return wrap
 
