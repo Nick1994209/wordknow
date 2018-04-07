@@ -1,5 +1,7 @@
 import logging
 
+import telebot
+
 from app.models import User
 from app.utils import get_datetime_now
 from telegram.constants import Handlers
@@ -28,10 +30,10 @@ def notify_repetition():
 
     markup = generate_markup(Handlers.repetition.path)
     for user in users.iterator():
-        bot.send_message(
-            user.chat_id,
+        safe_send_message(
+            user,
             'Hello my friend! Do you want to repetition new words?',
-            reply_markup=markup,
+            markup=markup,
         )
         user.learningstatus.update_notification_time(get_datetime_now())
 
@@ -47,12 +49,11 @@ def notify_learning():
 
     markup = generate_markup(Handlers.learn_words.path)
     for user in User.objects.iterator():
-        bot.send_message(
-            user.chat_id,
+        safe_send_message(
+            user,
             'Hi! I want to suggest learning new words) Давай, изучи пару слов!',
-            reply_markup=markup,
+            markup=markup,
         )
-
     logger.info('End notify_learning')
 
 
@@ -67,3 +68,10 @@ def can_run_task():
 
     logger.info('My time is not got! %s', now)
     return False
+
+
+def safe_send_message(user, text, markup=None):
+    try:
+        bot.send_message(user.chat_id, text, reply_markup=markup)
+    except telebot.apihelper.ApiException as e:
+        logger.info('%s cant send message: %s', user.username, e)

@@ -12,4 +12,8 @@ if __name__ == "__main__":
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+
+    from project.utils import run_retrying_connect_to_db
+
+    run_retrying_connect_to_db()
     execute_from_command_line(sys.argv)
