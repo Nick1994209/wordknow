@@ -114,7 +114,7 @@ def guess_word(message: telebot.types.Message, user: User) -> bool:
         return True
 
     word = repeated_word_status.word
-    if word.translate.lower() == guess_translated.lower():
+    if word.translate.lower().strip() == guess_translated.lower().strip():
         bot.send_message(user.chat_id, get_success_text())
         return True
 
