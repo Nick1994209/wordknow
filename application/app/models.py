@@ -3,8 +3,11 @@ import typing
 from datetime import timedelta
 
 from django.db import models
+from django.db.transaction import atomic
 from django.utils import timezone
 from django.utils.functional import cached_property
+
+from app.utils import get_datetime_now
 
 logger = logging.getLogger(__name__)
 
@@ -56,10 +59,19 @@ class User(CreatedUpdateBaseModel):
             status = LearningStatus.objects.create(user_id=self.id)
         return status
 
+    @atomic
     def update_status(self, status):
         logger.info('User %s update status from %s - %s', self.username, self.status, status)
+        if status == self.status:
+            return
+
+        self.perform_last_status_actions(old_status=self.status)
         self.status = status
         self.save(update_fields=('status',))
+
+    def perform_last_status_actions(self, old_status):
+        if old_status == self.Status.REPETITION:
+            self.learning_status.set_complete_repetition_words()
 
     def status_is_free(self):
         return self.status == self.Status.FREE
@@ -171,6 +183,21 @@ class LearningStatus(CreatedUpdateBaseModel):
         from_word_id = self.learn_word_id or 0
         return Word.objects.filter(id__gt=from_word_id).first()
 
+    def get_next_repeat_word_status(self, start_repetition=False) -> typing.Union[WordStatus, None]:
+
+        if start_repetition:
+            repetition_word_status_id = 0
+        else:
+            repetition_word_status_id = self.repetition_word_status_id
+
+        next_repeat_words = filter(
+            lambda x: x.id > repetition_word_status_id, self.repeat_words.all(),
+        )
+        next_repeat_words = sorted(next_repeat_words, key=lambda x: x.id)
+        if next_repeat_words:
+            return next_repeat_words[0]
+        return None
+
     def set_next_learn_word(self):
         word = self.next_learn_word
         logger.info(
@@ -189,3 +216,13 @@ class LearningStatus(CreatedUpdateBaseModel):
         )
         self.repetition_notified = set_time
         self.save(update_fields=('repetition_notified', ))
+
+    def set_complete_repetition_words(self):
+        next_repeat_word_status = self.get_next_repeat_word_status()
+        last_repeat_id = next_repeat_word_status and next_repeat_word_status.id or float('Inf')
+
+        update_repeat_words = filter(lambda w: w.id < last_repeat_id, self.repeat_words.all())
+        now = get_datetime_now()
+        for word_status in update_repeat_words:
+            word_status.set_next_repetition_time(now)
+        self.repeat_words.clear()

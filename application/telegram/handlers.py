@@ -10,11 +10,9 @@ from project import settings
 
 from .bot import bot
 from .botan import botan_track
-from .constants import Handlers, Emogies
-from .utils import (
-    choice_next_learning_word, get_learn_repeat_markup, get_user,
-    guess_word, repeat_word, set_learn_word,
-)
+from .constants import Emogies, Handlers
+from .utils import (choice_next_learning_word, get_learn_repeat_markup,
+                    get_user, guess_word, repeat_word, set_learn_word)
 
 logger = logging.getLogger('telegram_handlers')
 

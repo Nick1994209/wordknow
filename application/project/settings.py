@@ -15,12 +15,13 @@ from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # environments in main directory
-load_dotenv(dotenv_path=os.path.join(BASE_DIR, '../environments.env'), verbose=True)
+env_file_path = os.path.join(BASE_DIR, '../environments.env')
+if os.path.exists(env_file_path):
+    load_dotenv(dotenv_path=env_file_path, verbose=True)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import pytz
 from django.utils import timezone
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -88,11 +89,11 @@ WSGI_APPLICATION = 'project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'wordknow_db',
-        'USER': 'wordknow',
-        'PASSWORD': '123',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': os.getenv('DB_NAME', 'wordknow_db'),
+        'USER': os.getenv('DB_USER', 'wordknow'),
+        'PASSWORD': os.getenv('DB_PASSWORD', '123'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', ''),
     }
 }
 
@@ -135,6 +136,8 @@ STATIC_URL = '/static/'
 STATIC_FILES_BASE_DIR = os.environ.get('STATIC_FILES_BASE_DIR', '/app_static_files/')
 STATIC_ROOT = os.path.join(STATIC_FILES_BASE_DIR, 'static/')
 LOGS_PATH = os.environ.get('LOGS_PATH', 'logs')
+if not os.path.exists(LOGS_PATH):
+    os.mkdir(LOGS_PATH)
 
 LOGGING = {
     'version': 1,
@@ -198,6 +201,10 @@ LOGGING = {
         },
     },
 }
+
+# retry connect to db
+COUNT_TRIES_CONNECT = 10
+SLEEP_TIME = 10
 
 # -------- telegram ----------
 BOTAN_API_KEY = os.environ.get('BOTAN_API_KEY', '')

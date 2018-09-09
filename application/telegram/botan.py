@@ -12,47 +12,53 @@ TRACK_URL = 'https://api.botan.io/track'
 logger = logging.getLogger(__name__)
 
 
-def make_json(message):
-    data = {
-        'message_id': message.message_id,
-        'from': {
-            'id': message.from_user.id,
-        },
-        'chat': {
-            'id': message.chat.id,
-        },
-    }
-    if message.from_user.username is not None:
-        data['from']['username'] = message.from_user.username
-    return data
+class Botan:
+    # add retrying
+    @classmethod
+    def track(cls, uid, message, name='Message'):
+        if not settings.BOTAN_API_KEY:
+            return
 
+        msg = cls.make_json(message)
 
-# add retrying
-def track(token, uid, message, name='Message'):
-    try:
-        r = requests.post(
-            TRACK_URL,
-            params={"token": token, "uid": uid, "name": name},
-            data=make_json(message),
-            headers={'Content-type': 'application/json'},
-        )
-        return r.json()
-    except requests.exceptions.Timeout:
-        return False
-    except (requests.exceptions.RequestException, ValueError) as e:
-        logger.exception('botan exception: %s', e)
-        return False
+        try:
+            r = requests.post(
+                TRACK_URL,
+                params={"token": settings.BOTAN_API_KEY, "uid": uid, "name": name},
+                data=msg,
+                headers={'Content-type': 'application/json'},
+            )
+            return r.json()
+        except requests.exceptions.Timeout:
+            return False
+        except (requests.exceptions.RequestException, ValueError) as e:
+            logger.exception('botan exception: %s', e)
+            return False
+
+    @staticmethod
+    def make_json(message):
+        data = {
+            'message_id': message.message_id,
+            'from': {
+                'id': message.from_user.id,
+            },
+            'chat': {
+                'id': message.chat.id,
+            },
+        }
+        if message.from_user.username is not None:
+            data['from']['username'] = message.from_user.username
+        return data
 
 
 def botan_track(func):
     def wrap(message):
         func(message)
-        if settings.BOTAN_API_KEY:
-            track(settings.BOTAN_API_KEY, message.chat.id, message, func.__name__)
-        logger.info(
-            'Handler: %s chat_id: %s text: %s',
-            func.__name__, str(message.chat.id), message.text,
-        )
+        Botan.track(message.chat.id, message, func.__name__)
+        # logger.info(
+        #     'Handler: %s chat_id: %s text: %s',
+        #     func.__name__, str(message.chat.id), message.text,
+        # )
 
     return wrap
 
@@ -62,5 +68,5 @@ def safe_str(obj):
         return obj.encode('utf-8')
     except UnicodeEncodeError:
         return obj.encode('ascii', 'ignore').decode('ascii')
-    except:
+    except Exception:
         return ""

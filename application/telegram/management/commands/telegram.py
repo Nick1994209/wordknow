@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand
 
-from ...handlers import start
+from telegram import handlers
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        start()
+        handlers.start()

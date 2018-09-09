@@ -1,0 +1,60 @@
+version: "3.6"
+
+services:
+
+  server:
+    build: .
+    ports:
+    - "9900:8000"
+    links:
+    - pg
+    volumes:
+    - ./:/code/
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+    - DB_NAME=wordknow
+    - DB_USER=user
+    - DB_PASSWORD=pass
+    - DB_HOST=pg
+
+    depends_on:
+    - pg
+
+  telegram:
+    build: .
+    links:
+    - pg
+    volumes:
+    - ./:/code/
+    environment:
+    - DB_NAME=wordknow
+    - DB_USER=user
+    - DB_PASSWORD=pass
+    - DB_HOST=pg
+    command: python manage.py telegram
+    depends_on:
+    - pg
+
+  telegram_tasks:
+    build: .
+    links:
+    - pg
+    volumes:
+    - ./:/code/
+    environment:
+    - DB_NAME=wordknow
+    - DB_USER=user
+    - DB_PASSWORD=pass
+    - DB_HOST=pg
+    command: python manage.py telegram_tasks
+    depends_on:
+    - pg
+
+  pg:
+    image: postgres
+    environment:
+    - POSTGRES_PASSWORD=pass
+    - POSTGRES_USER=user
+    - POSTGRES_DB=wordknow
+    volumes:
+    - ./.pg:/var/lib/postgresql/data/

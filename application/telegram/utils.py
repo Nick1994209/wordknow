@@ -7,7 +7,7 @@ from app.models import LearningStatus, User, WordStatus
 from app.utils import get_datetime_now
 
 from .bot import bot
-from .constants import Commands, Handlers, Emogies
+from .constants import Commands, Emogies, Handlers
 
 logger = logging.getLogger(__name__)
 
@@ -74,37 +74,21 @@ def repeat_word(user: User, start_repetition=False):
     # start_repetition - если мы только начинаем повторять слова, то ставит в True
     learning_status = user.learning_status
 
-    if start_repetition:
-        repetition_word_status_id = 0
-    else:
-        repetition_word_status_id = user.learning_status.repetition_word_status_id
-
-    next_repeat_words = filter(
-        lambda x: x.id > repetition_word_status_id, learning_status.repeat_words.all(),
-    )
-    next_repeat_words = sorted(next_repeat_words, key=lambda x: x.id)
-    if not next_repeat_words:
-        user.update_status(User.Status.FREE)
-        user.learning_status.update_notification_time(None)
+    next_word_status = learning_status.get_next_repeat_word_status(start_repetition)
+    if not next_word_status:
+        learning_status.update_notification_time(None)
+        learning_status.set_complete_repetition_words()
 
         bot.send_message(
             user.chat_id,
             'My congratulations! Вы повторили все слова ' + Emogies.fearful,
             reply_markup=get_learn_repeat_markup(),
         )
-        set_complete_repetition_words(learning_status)
+        user.update_status(User.Status.FREE)
         return
 
-    word_status = next_repeat_words[0]
-    learning_status.set_repetition_word_status_id(word_status.id)
-    bot.send_message(user.chat_id, word_status.word.text, )
-
-
-def set_complete_repetition_words(learning_status: LearningStatus):
-    now = get_datetime_now()
-    for word_status in learning_status.repeat_words.all():
-        word_status.set_next_repetition_time(now)
-    learning_status.repeat_words.clear()
+    learning_status.set_repetition_word_status_id(next_word_status.id)
+    bot.send_message(user.chat_id, next_word_status.word.text, )
 
 
 def guess_word(message: telebot.types.Message, user: User) -> bool:
