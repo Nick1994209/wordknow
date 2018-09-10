@@ -113,7 +113,7 @@ def query_text(query):
     else:
         text = 'Words not append to db'
 
-    start_text = settings.TELEGRAM_NAME + " I'm learning words! And you? " + Emogies.wink
+    start_text = settings.TELEGRAM_BOT_NAME + " I'm learning words! And you? " + Emogies.wink
 
     single_msg = telebot.types.InlineQueryResultArticle(
         id="1", title=text[:200],

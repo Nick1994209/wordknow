@@ -3,7 +3,8 @@ FROM python:3.7-alpine3.7
 # for psycopg2
 RUN apk update && \
  apk add postgresql-libs && \
- apk add --virtual .build-deps gcc musl-dev postgresql-dev
+ apk add --virtual .build-deps gcc musl-dev postgresql-dev  # Psycopg requirements
+RUN apk add build-base jpeg-dev zlib-dev   # Pillow requirements
 
 ADD ./requirements.txt ./requirements.txt
 RUN pip3 install --upgrade pip

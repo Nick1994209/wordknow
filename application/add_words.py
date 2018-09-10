@@ -29,4 +29,4 @@ def set_words(file_path):
 
 if __name__ == '__main__':
     set_django_env()
-    set_words('application/words')
+    set_words('dictionary.txt')

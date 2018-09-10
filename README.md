@@ -28,3 +28,13 @@
 
     docker-compose up
  
+###### Add environments.env with secrets
+    
+    TELEGRAM_BOT_KEY='****-***'
+    TELEGRAM_BOT_NAME='@your_bot_name'
+
+    DEBUG=True
+
+    # you can add proxy
+    #http_proxy=host:port
+    #https_proxy=host:port

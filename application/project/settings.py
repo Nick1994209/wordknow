@@ -209,4 +209,4 @@ SLEEP_TIME = 10
 # -------- telegram ----------
 BOTAN_API_KEY = os.environ.get('BOTAN_API_KEY', '')
 TELEGRAM_BOT_KEY = os.environ.get('TELEGRAM_BOT_KEY', '')
-TELEGRAM_NAME = os.environ.get('TELEGRAM_NAME', '')
+TELEGRAM_BOT_NAME = os.environ.get('TELEGRAM_BOT_NAME', '')
