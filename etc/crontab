@@ -1,5 +1,8 @@
 MANAGE_PY_COMMAND='/usr/bin/python3 /code/wordknow/application/manage.py'
 
+# don't forget! create directory /logs
 @reboot $MANAGE_PY_COMMAND telegram >> /logs/cron_telegram 2>&1
-*/5 * * * * $MANAGE_PY_COMMAND telegram_tasks notify_repetition >> /logs/cron_notify_repetition 2>&1
-0 */5 * * * $MANAGE_PY_COMMAND telegram_tasks notify_learning >> /logs/cron_notify_learning 2>&1
+@reboot $MANAGE_PY_COMMAND telegram_tasks >> /logs/cron_telegram 2>&1
+
+# */5 * * * * $MANAGE_PY_COMMAND telegram_tasks notify_repetition >> /logs/cron_notify_repetition 2>&1
+# 0 */5 * * * $MANAGE_PY_COMMAND telegram_tasks notify_learning >> /logs/cron_notify_learning 2>&1
