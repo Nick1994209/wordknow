@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from datetime import timedelta
+
 from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -200,6 +202,14 @@ LOGGING = {
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
     },
+}
+
+REPETITION_TIMES = {
+    1: timedelta(minutes=20),
+    2: timedelta(hours=1),
+    3: timedelta(hours=6),
+    4: timedelta(days=1),
+    5: timedelta(days=3),
 }
 
 # retry connect to db

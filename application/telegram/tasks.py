@@ -47,7 +47,7 @@ def notify_learning():
         logger.info('End (time) notify_learning')
         return
 
-    markup = generate_markup(Handlers.learn_words.path)
+    markup = generate_markup(Handlers.learn_words.path, Handlers.repetition.path)
     for user in User.objects.iterator():
         safe_send_message(
             user,

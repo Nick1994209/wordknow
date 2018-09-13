@@ -16,9 +16,10 @@
         docker-compose run server python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'pass')"
 
      
-  * you can add words to db
-  
-        docker-compose run server python application/add_words.py
+  * you can add words to db (for everyone without --user)
+        
+        # --user 1
+        docker-compose run server python application/add_words.py --file_path words/nicking.txt
      
   * and run telegram_tasks, server, and telegram;
         

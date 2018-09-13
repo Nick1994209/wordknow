@@ -14,8 +14,8 @@ class Command(BaseCommand):
         autoreload.main(self.main)
 
     def main(self):
-        schedule.every(6).hours.do(tasks.notify_repetition)
-        schedule.every(6).hours.do(tasks.notify_learning)
+        schedule.every(5).minutes.do(tasks.notify_repetition)
+        schedule.every(5).hours.do(tasks.notify_learning)
 
         while True:
             try:

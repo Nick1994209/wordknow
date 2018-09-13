@@ -12,6 +12,8 @@ events {
 
 http {
     default_type application/octet-stream;
+    include       /etc/nginx/mime.types;
+
     access_log /var/log/nginx/access.log combined;
     sendfile on;
 
@@ -25,6 +27,8 @@ http {
         listen 80;
 
         keepalive_timeout 20;
+        access_log  /var/log/nginx/project.access.log;
+        error_log  /var/log/nginx/project.error.log;
 
         location /static/ {
             root /app_static_files;

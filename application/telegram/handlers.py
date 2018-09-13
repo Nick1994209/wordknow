@@ -107,11 +107,12 @@ def text_handler(message):
 
 @bot.inline_handler(lambda query: True)
 def query_text(query):
-    last_word = Word.objects.last()
+    last_word = Word.objects.filter(user_id=None).last()
+
+    text = ''
     if last_word:
         text = last_word.learn_text
-    else:
-        text = 'Words not append to db'
+    logger.warning('DO NOT HAVE GENERAL WORDS')
 
     start_text = settings.TELEGRAM_BOT_NAME + " I'm learning words! And you? " + Emogies.wink
 

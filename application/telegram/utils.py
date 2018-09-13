@@ -28,13 +28,15 @@ def choice_next_learning_word(user: User):
     if not word:
         bot.send_message(
             user.chat_id,
-            get_success_text() +
-            ' Вы изучили все слова! Можно добавить еще слова для изучения! ' + Emogies.fearful
-            + Emogies.astonished,
+            '%s Вы изучили все слова! Можно добавить еще слова для изучения! %s %s ' % (
+                get_success_text(), Emogies.fearful, Emogies.astonished,
+            ),
         )
         user.update_status(User.Status.FREE)
         bot.send_message(
-            user.chat_id, 'Не хотите повторить изученное? %s /learning_status' % Emogies.astronaut,
+            user.chat_id,
+            'Не хотите повторить изученное? %s' % Emogies.astronaut,
+            reply_markup=generate_markup(Handlers.learn_words.path, Handlers.repetition.path),
         )
         return
 

@@ -1,7 +1,7 @@
 import logging
 import typing
-from datetime import timedelta
 
+from django.conf import settings
 from django.db import models
 from django.db.transaction import atomic
 from django.utils import timezone
@@ -19,7 +19,7 @@ class CreatedUpdateBaseModel(models.Model):
     def save(self, update_fields=None, **kwargs):
         if update_fields:
             update_fields = set(update_fields)
-            self.date_updated = timezone.now()
+            self.date_updated = get_datetime_now()
             update_fields.add('date_updated')
             update_fields = tuple(update_fields)
         super().save(update_fields=update_fields, **kwargs)
@@ -86,6 +86,8 @@ class User(CreatedUpdateBaseModel):
 class Word(CreatedUpdateBaseModel):
     text = models.CharField(max_length=256)
     translate = models.CharField(max_length=256)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             null=True, verbose_name='Cлово пользователя')
 
     def __str__(self):
         return self.text + ' - ' + self.translate
@@ -98,9 +100,10 @@ class Word(CreatedUpdateBaseModel):
 class WordStatus(CreatedUpdateBaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='learned_words')
     word = models.ForeignKey(Word, on_delete=models.CASCADE, related_name='learned_words')
-    start_repetition_time = models.DateTimeField()
-    count_repetitions = models.IntegerField(default=0)
-    number_not_guess = models.IntegerField(default=0)
+    start_repetition_time = models.DateTimeField(
+        null=True, verbose_name='Время когда нужно будет повторить слово')
+    count_repetitions = models.IntegerField(default=0, verbose_name='Количество повторений слова')
+    number_not_guess = models.IntegerField(default=0, verbose_name='Сколько раз не угадал слово')
 
     class Meta:
         verbose_name = 'Статус изучения слова'
@@ -114,17 +117,13 @@ class WordStatus(CreatedUpdateBaseModel):
         self.save(update_fields=('number_not_guess',))
 
     def set_next_repetition_time(self, from_time):
-        times = {
-            1: timedelta(hours=1),
-            2: timedelta(hours=6),
-            3: timedelta(days=1),
-            4: timedelta(days=7),
-            5: timedelta(days=30),
-            6: timedelta(days=120),
-        }
-        default_delta = timedelta(days=3 * 120)
         self.count_repetitions += 1
-        self.start_repetition_time = from_time + times.get(self.count_repetitions, default_delta)
+
+        next_repetition_time = settings.REPETITION_TIMES.get(self.count_repetitions)
+        if next_repetition_time:
+            self.start_repetition_time = from_time + next_repetition_time
+        else:
+            self.start_repetition_time = None
         self.save(update_fields=('count_repetitions', 'start_repetition_time'))
 
         logger.info(
@@ -136,9 +135,8 @@ class WordStatus(CreatedUpdateBaseModel):
 class LearningStatus(CreatedUpdateBaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     repeat_words = models.ManyToManyField(WordStatus)
-    number_not_guess = models.IntegerField(default=0)
-    count_words = models.IntegerField(default=5)
-
+    count_words = models.IntegerField(
+        default=5, verbose_name='Количество слов, которые пользователь будет учить за раз')
     repetition_word_status = models.ForeignKey(
         WordStatus, on_delete=models.SET_NULL, null=True, related_name='from_repetition',
         verbose_name='На этом слове остановились повторять',
@@ -172,7 +170,7 @@ class LearningStatus(CreatedUpdateBaseModel):
 
     def set_repetition_word_status_id(self, word_status_id):
         logger.info(
-            'LearningStatus %d update repetition_word_status_id %d',
+            'LearningStatus update: user=%d next repetition_word_status_id=%d',
             self.user_id, word_status_id,
         )
         self.repetition_word_status_id = word_status_id
@@ -181,7 +179,14 @@ class LearningStatus(CreatedUpdateBaseModel):
     @property
     def next_learn_word(self) -> typing.Union[Word, None]:
         from_word_id = self.learn_word_id or 0
-        return Word.objects.filter(id__gt=from_word_id).first()
+
+        # if user added words => return user word; else return general word
+        user_word = Word.objects.filter(user_id=self.user_id, id__gt=from_word_id).first()
+        if user_word:
+            return user_word
+
+        logger.info('User=%s without words', self.user_id)
+        return Word.objects.filter(user=None, id__gt=from_word_id).first()
 
     def get_next_repeat_word_status(self, start_repetition=False) -> typing.Union[WordStatus, None]:
 
@@ -201,7 +206,7 @@ class LearningStatus(CreatedUpdateBaseModel):
     def set_next_learn_word(self):
         word = self.next_learn_word
         logger.info(
-            'LearningStatus %d update next_learn_word: current=%d next=%d',
+            'LearningStatus user=%d update next_learn_word: current=%d next=%d',
             self.user_id, self.learn_word_id, word.id,
         )
 
