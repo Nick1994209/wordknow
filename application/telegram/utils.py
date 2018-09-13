@@ -90,7 +90,7 @@ def repeat_word(user: User, start_repetition=False):
         return
 
     learning_status.set_repetition_word_status_id(next_word_status.id)
-    bot.send_message(user.chat_id, next_word_status.get_text_for_translating())
+    bot.send_message(user.chat_id, next_word_status.get_word_for_translating())
 
 
 def guess_word(message: telebot.types.Message, user: User) -> bool:
