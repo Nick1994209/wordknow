@@ -90,23 +90,22 @@ def repeat_word(user: User, start_repetition=False):
         return
 
     learning_status.set_repetition_word_status_id(next_word_status.id)
-    bot.send_message(user.chat_id, next_word_status.word.text, )
+    bot.send_message(user.chat_id, next_word_status.get_text_for_translating())
 
 
 def guess_word(message: telebot.types.Message, user: User) -> bool:
     guess_translated = message.text
-    repeated_word_status = user.learning_status.get_repetition_word_status()
-    if repeated_word_status is None:
+    repetition_word_status = user.learning_status.repetition_word_status
+    if repetition_word_status is None:
         return True
 
-    word = repeated_word_status.word
-    if word.translate.lower().strip() == guess_translated.lower().strip():
+    if repetition_word_status.is_word_guessed(guess_translated):
         bot.send_message(user.chat_id, get_success_text())
         return True
 
-    repeated_word_status.increase_not_guess()
+    repetition_word_status.increase_not_guess()
     text = '%s \n Повторение - мать учения! Пожалуйста, напишите translate слова %s' % (
-        word.learn_text, Emogies.astonished,
+        repetition_word_status.word.learn_text, Emogies.astonished,
     )
 
     bot.send_message(user.chat_id, text)

@@ -53,6 +53,7 @@ class User(CreatedUpdateBaseModel):
             LearningStatus.objects.
                 filter(user_id=self.id).
                 prefetch_related('repeat_words').
+                select_related('repetition_word_status').
                 first()
         )
         if not status:
@@ -131,6 +132,21 @@ class WordStatus(CreatedUpdateBaseModel):
             self.user_id, self.word.text, self.count_repetitions, self.start_repetition_time,
         )
 
+    @property
+    def is_conversely(self):
+        # служит что бы показать, мы будем угадывать слово или перевод
+        return self.count_repetitions % 2
+
+    def is_word_guessed(self, message: str):
+        check_word = self.get_translated_word()
+        return check_word.lower().strip() == message.lower().strip()
+
+    def get_word_for_translating(self):
+        return self.word.text if self.is_conversely else self.word.translate
+
+    def get_translated_word(self):
+        return self.word.translate if self.is_conversely else self.word.text
+
 
 class LearningStatus(CreatedUpdateBaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -155,18 +171,6 @@ class LearningStatus(CreatedUpdateBaseModel):
 
     def __str__(self):
         return self.user.username + ' learning_status'
-
-    def get_repetition_word_status(self) -> typing.Union[WordStatus, None]:
-        if not self.repetition_word_status_id:
-            return None
-
-        word_statuses = [
-            ws for ws in self.repeat_words.all() if ws.id == self.repetition_word_status_id
-        ]
-        if len(word_statuses) != 1:
-            logger.error('WTF. %s; repetition_id = %d ', word_statuses, self.id)
-            raise Exception('Как так? Я тут не должен был оказаться')
-        return word_statuses[0]
 
     def set_repetition_word_status_id(self, word_status_id):
         logger.info(
