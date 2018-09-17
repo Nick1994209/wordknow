@@ -1,5 +1,7 @@
 import logging
+import random
 import typing
+import uuid
 
 from django.conf import settings
 from django.db import models
@@ -44,6 +46,12 @@ class User(CreatedUpdateBaseModel):
     username = models.CharField(max_length=100, verbose_name='ID чата в телеграме')
     status = models.CharField(max_length=50, choices=Status.CHOICES, default=Status.FREE)
 
+    auth_code = models.CharField(
+        max_length=10, default='', verbose_name='Код для авторизации',
+        help_text='Высылается в telegram при попытке авторизоваться',
+    )
+    auth_token = models.UUIDField(null=True)
+
     def __str__(self):
         return self.username
 
@@ -82,6 +90,16 @@ class User(CreatedUpdateBaseModel):
 
     def status_is_repetition(self):
         return self.status == self.Status.REPETITION
+
+    def generate_auth_code(self):
+        self.auth_code = str(random.randint(1000, 9999))
+
+        self.auth_code = '1111'
+        self.save(update_fields=('auth_code',))
+
+    def generate_auth_token(self):
+        self.auth_token = uuid.uuid4()
+        self.save(update_fields=('auth_token',))
 
 
 class Word(CreatedUpdateBaseModel):
@@ -224,7 +242,7 @@ class LearningStatus(CreatedUpdateBaseModel):
             self.user_id, set_time,
         )
         self.repetition_notified = set_time
-        self.save(update_fields=('repetition_notified', ))
+        self.save(update_fields=('repetition_notified',))
 
     def set_complete_repetition_words(self):
         next_repeat_word_status = self.get_next_repeat_word_status()

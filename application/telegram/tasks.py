@@ -73,5 +73,10 @@ def can_run_task():
 def safe_send_message(user, text, markup=None):
     try:
         bot.send_message(user.chat_id, text, reply_markup=markup)
+        return True
     except telebot.apihelper.ApiException as e:
         logger.info('%s cant send message: %s', user.username, e)
+        return False
+    except Exception as e:
+        logger.exception('%s cant send message: base exception=%s', user.username, e)
+        return False

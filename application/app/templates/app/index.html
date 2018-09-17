@@ -1,0 +1,15 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <h1>Hello, world!</h1>
+
+    {% if not user %}
+        <div>
+            <a href="{% url 'login' %}" class="btn btn-success">Войти</a>
+        </div>
+    {% endif %}
+
+    <div>
+        <a href="{% url 'words' %}" class="btn btn-success">Просмотреть список слов</a>
+    </div>
+{% endblock %}

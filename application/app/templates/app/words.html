@@ -1,0 +1,21 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+
+    {% if user %}
+        <h2>Ваши слова!</h2>
+    {% else %}
+        <h2>Общие слова!</h2>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'create_words' %}" class="btn btn-success">Добавить слова</a>
+    <br>
+    <br>
+
+    <ul class="list-group">
+        {% for word in object_list %}
+            <li class="list-group-item">{{ word }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
