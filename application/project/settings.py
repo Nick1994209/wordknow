@@ -32,7 +32,7 @@ from django.utils import timezone
 SECRET_KEY = '@zh4@xgoscsx)20c-(k#)h%@$40p#rzrx&mg$p)^4c17_9omsd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', False)
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']
 

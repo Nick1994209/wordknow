@@ -47,7 +47,7 @@ class User(CreatedUpdateBaseModel):
     status = models.CharField(max_length=50, choices=Status.CHOICES, default=Status.FREE)
 
     auth_code = models.CharField(
-        max_length=10, default='', verbose_name='Код для авторизации',
+        max_length=10, null=True, verbose_name='Код для авторизации',
         help_text='Высылается в telegram при попытке авторизоваться',
     )
     auth_token = models.UUIDField(null=True)
@@ -97,7 +97,8 @@ class User(CreatedUpdateBaseModel):
 
     def generate_auth_token(self):
         self.auth_token = uuid.uuid4()
-        self.save(update_fields=('auth_token',))
+        self.auth_code = None
+        self.save(update_fields=('auth_token', 'auth_code'))
 
 
 class Word(CreatedUpdateBaseModel):
