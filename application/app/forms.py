@@ -2,18 +2,8 @@ from django import forms
 from app.models import User
 
 
-class LoginForm(forms.Form):
+class EnterLoginForm(forms.Form):
     user = forms.CharField(label='Telegram username', max_length=200)
-    auth_code = forms.CharField(
-        label='Пароль', help_text='Должен прийти в telegram',
-        widget=forms.PasswordInput(), max_length=4, required=False,
-    )
-
-    def __init__(self, *args, **kwargs):
-        hide_auth_code = kwargs.pop('hide_auth_code', False)
-        super().__init__(*args, **kwargs)
-        if hide_auth_code:
-            self.fields.pop('auth_code')
 
     def clean_user(self) -> User:
         try:
@@ -21,14 +11,21 @@ class LoginForm(forms.Form):
         except User.DoesNotExist:
             raise forms.ValidationError('Пользователь не найден')
 
-    def has_auth_token(self):
-        return bool(self.cleaned_data['auth_code'])
+
+class LoginForm(EnterLoginForm):
+    user = forms.CharField(label='Telegram username', max_length=200, disabled=True)
+    auth_code = forms.CharField(
+        label='Пароль', help_text='Должен прийти в telegram',
+        widget=forms.PasswordInput(), max_length=4,
+    )
 
 
 class WordsForm(forms.Form):
-    words = forms.CharField(label='Слова', widget=forms.Textarea(), max_length=10000,
-                            required=False)
-    splitter = forms.CharField(label='Знак разделения слов')
+    words = forms.CharField(
+        label='Слова', widget=forms.Textarea(), max_length=150000, required=False,
+        help_text='Добавляйте слова разделяя слово с переводом знаком разделения. '
+                  'С переносом строки можно добавить еще слова с переводом. Пример: "hello;привет"')
+    splitter = forms.CharField(label='Знак разделения слова с переводом')
     first_run = forms.NullBooleanField(widget=forms.HiddenInput())
 
     def get_without_trash_words(self):

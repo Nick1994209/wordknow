@@ -43,6 +43,7 @@ class AuthenticationMixin(SetCookiesMixin):
         auth_token = request.COOKIES.get(self.auth_cookie_name)
         if not auth_token:
             self._user = None
+            return
         self._user = User.objects.filter(auth_token=auth_token).first()
 
     def authenticate(self, user: User, auth_code: str):

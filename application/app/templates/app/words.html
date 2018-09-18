@@ -4,14 +4,18 @@
 
     {% if user %}
         <h2>Ваши слова!</h2>
+
+        <br>
+        <a href="{% url 'create_words' %}" class="btn btn-success">Добавить слова</a>
+        <br>
+        <br>
     {% else %}
         <h2>Общие слова!</h2>
+        <br>
+        <div>
+            Вы можете войти в систему и добавить себе слов)
+        </div>
     {% endif %}
-
-    <br>
-    <a href="{% url 'create_words' %}" class="btn btn-success">Добавить слова</a>
-    <br>
-    <br>
 
     <ul class="list-group">
         {% for word in object_list %}

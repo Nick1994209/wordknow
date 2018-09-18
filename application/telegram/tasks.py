@@ -1,13 +1,13 @@
 import logging
 
 import telebot
+from django.conf import settings
 
 from app.models import User
 from app.utils import get_datetime_now
 from telegram.constants import Handlers
 from telegram.utils import generate_markup
-
-from .bot import bot
+from telegram.bot import bot
 
 logger = logging.getLogger('telegram_tasks')
 
@@ -71,6 +71,9 @@ def can_run_task():
 
 
 def safe_send_message(user, text, markup=None):
+    if settings.TELEGRAM_DEBUG:
+        return True
+
     try:
         bot.send_message(user.chat_id, text, reply_markup=markup)
         return True

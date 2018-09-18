@@ -93,8 +93,6 @@ class User(CreatedUpdateBaseModel):
 
     def generate_auth_code(self):
         self.auth_code = str(random.randint(1000, 9999))
-
-        self.auth_code = '1111'
         self.save(update_fields=('auth_code',))
 
     def generate_auth_token(self):

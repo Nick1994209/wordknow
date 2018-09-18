@@ -1,53 +1,53 @@
+from django.conf import settings
 from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.views.generic import TemplateView, FormView, ListView, CreateView
-from django import forms as django_forms
+from django.views.generic import TemplateView, FormView, ListView
 
+from app import forms
 from app.mixins import AuthenticationMixin, TemplateFormMixin
 from app.models import User, Word
-from app import forms
 from telegram.tasks import safe_send_message
 
 
 class IndexView(AuthenticationMixin, TemplateView):
     template_name = 'app/index.html'
+    extra_context = {'bot_name': settings.TELEGRAM_BOT_NAME}
 
 
-class LoginView(AuthenticationMixin, TemplateFormMixin, FormView):
-    form_class = forms.LoginForm
-    success_url = 'words'
-    button_name = 'Вход'
+class AboutBotView(AuthenticationMixin, TemplateView):
+    template_name = 'app/about_bot.html'
+    extra_context = {'bot_name': settings.TELEGRAM_BOT_NAME}
 
-    def get_form_kwargs(self, hide_auth_code=False):
-        kwargs = super().get_form_kwargs()
-        if self.request.method == 'GET' or hide_auth_code:
-            kwargs['hide_auth_code'] = True
-        return kwargs
+
+class EnterLoginView(AuthenticationMixin, TemplateFormMixin, FormView):
+    form_class = forms.EnterLoginForm
+    success_url = 'login'
+    button_name = 'Войти'
+    title = 'Вход'
 
     def form_valid(self, form):
-        form.fields['auth_code'].required = True
-        form.fields['user'].widget.attrs['readonly'] = True
-
-        if not form.has_auth_token():
-            return self.send_password_and_show_form(form)
-
-        return self.try_authenticate(form)
-
-    def send_password_and_show_form(self, form):
-
         user = form.cleaned_data['user']
         user.generate_auth_code()
         msg = 'Для получения доступа к личному кабинету введите пароль: %s' % user.auth_code
 
         if safe_send_message(user, msg):
-            return self.render_form(form)
+            url = '{}?user={}'.format(self.get_success_url(), user.username)
+            return HttpResponseRedirect(url)
         else:
-            form = self.form_class(**self.get_form_kwargs(hide_auth_code=True))
             return self.render_form(
                 form, errors='Не смог отправить сообщение в telegram. Попробуйте еще раз.',
             )
 
-    def try_authenticate(self, form):
+
+class LoginView(AuthenticationMixin, TemplateFormMixin, FormView):
+    form_class = forms.LoginForm
+    success_url = 'words'
+    title = 'Вход'
+    button_name = 'Вход'
+
+    def get_initial(self):
+        return {'user': self.request.GET.get('user')}
+
+    def form_valid(self, form):
         if not self.authenticate(form.cleaned_data['user'], form.cleaned_data['auth_code']):
             return self.render_form(form, errors='Пароли не совпадают.')
         return super().form_valid(form)

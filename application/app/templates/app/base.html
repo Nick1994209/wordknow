@@ -13,10 +13,12 @@
         <a class="navbar-brand" href="/">WORDKNOW</a>
         {% if user %}
             <a class="navbar-brand" href="/">{{ user }}</a>
+        {% else %}
+            <a class="navbar-brand" href="{% url 'enter_login' %}">Войти</a>
         {% endif %}
     </nav>
 
-    <div class="container">{% block content %}{% endblock %}</div>
+    <div style="margin-top: 20px" class="container">{% block content %}{% endblock %}</div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>

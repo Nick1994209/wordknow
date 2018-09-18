@@ -39,9 +39,12 @@ def start_handler(message: telebot.types.Message):
     user = get_user(message)
 
     if user.status == User.Status.LEARNING:
-        send_message += '\n Сейчас вы находитесь в стадии заучивания новых слов :)'
+        send_message += '\n Сейчас Вы находитесь в стадии заучивания новых слов :)'
     if user.status == User.Status.REPETITION:
-        send_message += '\n Сейчас вы находитесь в стадии повторения слов :)'
+        send_message += '\n Сейчас Вы находитесь в стадии повторения слов :)'
+
+    send_message += ('\n Вы можете добавить слова которые хотите изучить на сайте %s'
+                     % settings.BOT_SITE_URL)
     bot.send_message(chat_id, send_message, reply_markup=get_learn_repeat_markup())
 
 
@@ -83,7 +86,7 @@ def stop_handler(message):
     user.update_status(user.Status.FREE)
     bot.send_message(
         user.chat_id,
-        'Да! Вы вольная птица). Чем вы теперь хотите заняться?',
+        'Да! Вы вольная птица). Чем Вы теперь хотите заняться?',
         reply_markup=get_learn_repeat_markup(),
     )
 
@@ -94,7 +97,7 @@ def stop_handler(message):
 def text_handler(message):
     user = get_user(message)
     if user.status_is_free():
-        bot.send_message(message.chat.id, 'Не понятна :( что вы хотите? ' + Handlers.help.path)
+        bot.send_message(message.chat.id, 'Не понятна :( что Вы хотите? ' + Handlers.help.path)
     elif user.status_is_learning():
         set_learn_word(message, user)
         choice_next_learning_word(user)

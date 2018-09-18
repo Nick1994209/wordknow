@@ -3,15 +3,16 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-
-    {% if title %}
-        <h2>{{ title }}</h2>
-    {% endif %}
-
     {% block form %}
 
         <div class="row">
             <div class="col-md-6 offset-md-3">
+
+                {% if title %}
+                    <h2>{{ title }}</h2>
+                    <br>
+                {% endif %}
+
                 {% if errors %}
                     <div class="alert alert-danger" role="alert">{{ errors }}</div>
                 {% endif %}
@@ -19,7 +20,6 @@
                 <form method="post">
                     {% csrf_token %}
                     {{ form|crispy }}
-                    <br>
                     <button class="btn btn-success">{{ button_name }}</button>
                 </form>
             </div>

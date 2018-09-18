@@ -104,8 +104,10 @@ def guess_word(message: telebot.types.Message, user: User) -> bool:
         return True
 
     repetition_word_status.increase_not_guess()
-    text = '%s \n Повторение - мать учения! Пожалуйста, напишите translate слова %s' % (
-        repetition_word_status.word.learn_text, Emogies.astonished,
+    text = '%s \n Повторение - мать учения! Пожалуйста, напишите translate слова %s %s' % (
+        repetition_word_status.word.learn_text,
+        repetition_word_status.get_word_for_translating(),
+        Emogies.astonished,
     )
 
     bot.send_message(user.chat_id, text)

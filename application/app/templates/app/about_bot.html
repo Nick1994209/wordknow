@@ -1,0 +1,48 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <h4 class="display-4 text-center">
+        Бот {{ bot_name }}
+    </h4>
+    <h4 class="text-center">
+        График повторения слов
+    </h4>
+    <br>
+    <br>
+
+    <div>
+        <div class="row">
+            <table class="table col-md-6 offset-md-3">
+                <thead>
+                <tr>
+                    <th style="border-top: 0">Повторение</th>
+                    <th style="border-top: 0">Через время</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>20 минут</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>1 час</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>6 часов</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>1 день</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>3 день</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+    </div>
+{% endblock %}

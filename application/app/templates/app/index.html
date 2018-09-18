@@ -1,15 +1,35 @@
 {% extends 'app/base.html' %}
 
 {% block content %}
-    <h1>Hello, world!</h1>
-
-    {% if not user %}
-        <div>
-            <a href="{% url 'login' %}" class="btn btn-success">Войти</a>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">Welcome!</h1>
+            <p class="lead">
+                Тут вы можете войти под своим пользоавтелем через телеграм {{ bot_name }}
+            </p>
+            <p>
+                Для этого найдите бота в телегррамме и начните учить слова прямо сейчас!
+            </p>
         </div>
-    {% endif %}
+    </div>
 
     <div>
-        <a href="{% url 'words' %}" class="btn btn-success">Просмотреть список слов</a>
+        <p style="margin-bottom: 0">Данный бот позволяет учить слова.</p>
+        <p style="margin-bottom: 0">Будет Вас уведомлять о необходимости изучить новые.</p>
+        <p>Будет напоминать о повторении изученных слов.</p>
+    </div>
+
+    <div>
+        <a href="{% url 'words' %}" class="btn btn-success">
+            Просмотреть список
+            {% if user %}
+                своих
+            {% else %}
+                общих
+            {% endif %}
+            слов
+        </a>
+
+        <a href="{% url 'about_bot' %}" class="btn btn-info">График повторения слов</a>
     </div>
 {% endblock %}

@@ -123,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 DEFAULT_TIMEZONE = 'Europe/Moscow'
@@ -223,3 +223,7 @@ SLEEP_TIME = 10
 BOTAN_API_KEY = os.environ.get('BOTAN_API_KEY', '')
 TELEGRAM_BOT_KEY = os.environ.get('TELEGRAM_BOT_KEY', '')
 TELEGRAM_BOT_NAME = os.environ.get('TELEGRAM_BOT_NAME', '')
+TELEGRAM_DEBUG = os.environ.get('TELEGRAM_DEBUG', 'false').lower() == 'true'
+
+BOT_SITE_URL = os.environ.get('BOT_SITE_URL', 'http://localhost:8000')
+
