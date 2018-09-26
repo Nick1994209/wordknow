@@ -51,3 +51,4 @@ python-dotenv==0.8.2
 schedule==0.5.0
 # bootstrap4 beauty forms
 django-crispy-forms==1.7.2
+beautifulsoup4==4.6.3

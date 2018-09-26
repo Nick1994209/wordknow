@@ -216,8 +216,8 @@ REPETITION_TIMES = {
 }
 
 # retry connect to db
-COUNT_TRIES_CONNECT = 10
-SLEEP_TIME = 10
+COUNT_TRIES_CONNECT = 100
+SLEEP_TIME = 1
 
 # -------- telegram ----------
 BOTAN_API_KEY = os.environ.get('BOTAN_API_KEY', '')
@@ -226,4 +226,3 @@ TELEGRAM_BOT_NAME = os.environ.get('TELEGRAM_BOT_NAME', '')
 TELEGRAM_DEBUG = os.environ.get('TELEGRAM_DEBUG', 'false').lower() == 'true'
 
 BOT_SITE_URL = os.environ.get('BOT_SITE_URL', 'http://localhost:8000')
-
