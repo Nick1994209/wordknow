@@ -1,7 +1,13 @@
+import logging
+from functools import wraps
+from time import sleep
+
 import pytz
 from django.utils import timezone
 
 from project import settings
+
+log = logging.getLogger(__name__)
 
 
 def use_timezone(date):
@@ -21,3 +27,46 @@ def use_timezone(date):
 
 def get_datetime_now():
     return use_timezone(timezone.now())
+
+
+def retry_if_false(attempts_count=3, sleep_time=0.5, use_logging=False):
+    """ retry ryb function
+
+    :param attempts_count: run function while func will not return boolean True
+    :param sleep_time: time sleep in seconds
+
+    example usage:
+
+        @retry_if_false()
+        def your_func(*args, **kwargs):
+            ...
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def wrap(*args, **kwargs):
+            for count in range(attempts_count):
+                result = func(*args, **kwargs)
+                if result:
+                    return result
+                if use_logging:
+                    log.info('Retry count=%d func=%s', count, func.__name__)
+                sleep(sleep_time)
+            return False
+
+        return wrap
+
+    return decorator
+
+
+def safe_str(obj):
+    if isinstance(obj, str):
+        return obj.encode('unicode_escape').decode('utf-8')
+    if isinstance(obj, bytes):
+        try:
+            return obj.decode('utf-8')
+        except UnicodeEncodeError:
+            return obj.decode('ascii', 'ignore')
+        except Exception:
+            return ""
+    return obj

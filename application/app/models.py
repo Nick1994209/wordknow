@@ -9,7 +9,7 @@ from django.db.transaction import atomic
 from django.utils import timezone
 from django.utils.functional import cached_property
 
-from app.utils import get_datetime_now
+from app.utils import get_datetime_now, safe_str
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class User(CreatedUpdateBaseModel):
 
     @atomic
     def update_status(self, status):
-        logger.info('User %s update status from %s - %s', self.username, self.status, status)
+        logger.debug('User=%s update status from %s - %s', self.id, self.status, status)
         if status == self.status:
             return
 
@@ -144,9 +144,10 @@ class WordStatus(CreatedUpdateBaseModel):
             self.start_repetition_time = None
         self.save(update_fields=('count_repetitions', 'start_repetition_time'))
 
-        logger.info(
+        logger.debug(
             'WordStatus %d %s update count_repetitions=%d time=%s',
-            self.user_id, self.word.text, self.count_repetitions, self.start_repetition_time,
+            self.user_id, safe_str(str(self.word)),
+            self.count_repetitions, self.start_repetition_time,
         )
 
     @property
@@ -190,7 +191,7 @@ class LearningStatus(CreatedUpdateBaseModel):
         return self.user.username + ' learning_status'
 
     def set_repetition_word_status_id(self, word_status_id):
-        logger.info(
+        logger.debug(
             'LearningStatus update: user=%d next repetition_word_status_id=%d',
             self.user_id, word_status_id,
         )
@@ -206,7 +207,7 @@ class LearningStatus(CreatedUpdateBaseModel):
         if user_word:
             return user_word
 
-        logger.info('User=%s without words', self.user_id)
+        logger.debug('User=%s without words', self.user_id)
         return Word.objects.filter(user=None, id__gt=from_word_id).first()
 
     def get_next_repeat_word_status(self, start_repetition=False) -> typing.Union[WordStatus, None]:
@@ -226,7 +227,7 @@ class LearningStatus(CreatedUpdateBaseModel):
 
     def set_next_learn_word(self):
         word = self.next_learn_word
-        logger.info(
+        logger.debug(
             'LearningStatus user=%d update next_learn_word: current=%d next=%d',
             self.user_id, self.learn_word_id, word.id,
         )
@@ -236,13 +237,14 @@ class LearningStatus(CreatedUpdateBaseModel):
         self.save(update_fields=('learn_word_id',))
 
     def update_notification_time(self, set_time=None):
-        logger.info(
-            'LearningStatus %d update notification_time: %s',
+        logger.debug(
+            'LearningStatus for user=%d update notification_time: %s',
             self.user_id, set_time,
         )
         self.repetition_notified = set_time
         self.save(update_fields=('repetition_notified',))
 
+    @atomic()
     def set_complete_repetition_words(self):
         next_repeat_word_status = self.get_next_repeat_word_status()
         last_repeat_id = next_repeat_word_status and next_repeat_word_status.id or float('Inf')

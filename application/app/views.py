@@ -1,11 +1,13 @@
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, FormView, ListView
 
 from app import forms
 from app.mixins import AuthenticationMixin, TemplateFormMixin
-from app.models import User, Word
-from telegram.tasks import safe_send_message
+from app.models import Word
+from telegram.utils import safe_send_message
 
 
 class IndexView(AuthenticationMixin, TemplateView):
@@ -30,7 +32,8 @@ class EnterLoginView(AuthenticationMixin, TemplateFormMixin, FormView):
         msg = 'Для получения доступа к личному кабинету введите пароль: %s' % user.auth_code
 
         if safe_send_message(user, msg):
-            url = '{}?user={}'.format(self.get_success_url(), user.username)
+            params = urlencode({'user': user.username})
+            url = '{}?{}'.format(self.get_success_url(), params)
             return HttpResponseRedirect(url)
         else:
             return self.render_form(

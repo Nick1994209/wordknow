@@ -1,13 +1,9 @@
 import logging
 
-import telebot
-from django.conf import settings
-
 from app.models import User
 from app.utils import get_datetime_now
 from telegram.constants import Handlers
-from telegram.utils import generate_markup
-from telegram.bot import bot
+from telegram.utils import generate_markup, safe_send_message
 
 logger = logging.getLogger('telegram_tasks')
 
@@ -68,18 +64,3 @@ def can_run_task():
 
     logger.info('My time is not got! %s', now)
     return False
-
-
-def safe_send_message(user, text, markup=None):
-    if settings.TELEGRAM_DEBUG:
-        return True
-
-    try:
-        bot.send_message(user.chat_id, text, reply_markup=markup)
-        return True
-    except telebot.apihelper.ApiException as e:
-        logger.info('%s cant send message: %s', user.username, e)
-        return False
-    except Exception as e:
-        logger.exception('%s cant send message: base exception=%s', user.username, e)
-        return False

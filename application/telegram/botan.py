@@ -5,6 +5,7 @@ import logging
 
 import requests
 
+from app.utils import retry_if_false, safe_str
 from project import settings
 
 TRACK_URL = 'https://api.botan.io/track'
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class Botan:
-    # add retrying
+    @retry_if_false(attempts_count=3, sleep_time=0.01)
     @classmethod
     def track(cls, uid, message, name='Message'):
         if not settings.BOTAN_API_KEY:
@@ -53,20 +54,10 @@ class Botan:
 
 def botan_track(func):
     def wrap(message):
+        logger.info(
+            'Received message by handler=%s chat_id=%s text=%s',
+            func.__name__, message.chat.id, safe_str(message.text),
+        )
         func(message)
         Botan.track(message.chat.id, message, func.__name__)
-        # logger.info(
-        #     'Handler: %s chat_id: %s text: %s',
-        #     func.__name__, str(message.chat.id), message.text,
-        # )
-
     return wrap
-
-
-def safe_str(obj):
-    try:
-        return obj.encode('utf-8')
-    except UnicodeEncodeError:
-        return obj.encode('ascii', 'ignore').decode('ascii')
-    except Exception:
-        return ""

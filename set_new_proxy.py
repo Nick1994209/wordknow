@@ -35,7 +35,7 @@ def get_https_proxy(body_proxy=None):
                 continue
 
             return https_proxy
-        except requests.exceptions.ConnectionError:
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
             print('error')
             continue
 
