@@ -33,7 +33,6 @@ class LearnWordRunner(BaseRunner):
         send_message(
             self.user, 'Изучать слова это здоворо! Приступим!' + constants.Emogies.astronaut,
         )
-        self.user.learning_status.set_complete_repetition_words()
         self.choice_next_word()
 
     @atomic
@@ -109,6 +108,8 @@ class RepeatWord(BaseRunner):
 
         send_message(self.user, 'Повторять слова это здоворо! Приступим! Введите перевод:')
         learning_status = self.user.learning_status
+        learning_status.set_complete_repetition_words()  # all repeated words set how repeated =)
+
         repetition_words = WordStatus.objects.filter(
             user=self.user, start_repetition_time__lt=get_datetime_now(),
         ).exclude(
@@ -116,7 +117,6 @@ class RepeatWord(BaseRunner):
         )
         self.user.learning_status.repeat_words.add(*repetition_words)
 
-        self.repeat(start_repetition=True)
 
     @atomic
     def run(self, is_first_run=False):
