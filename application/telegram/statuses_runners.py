@@ -108,7 +108,8 @@ class RepeatWord(BaseRunner):
 
         send_message(self.user, 'Повторять слова это здоворо! Приступим! Введите перевод:')
         learning_status = self.user.learning_status
-        learning_status.set_complete_repetition_words()  # all repeated words set how repeated =)
+        # all repeated words set how repeated =)
+        learning_status.set_complete_repetition_words(with_last_repeated=True)
 
         repetition_words = WordStatus.objects.filter(
             user=self.user, start_repetition_time__lt=get_datetime_now(),

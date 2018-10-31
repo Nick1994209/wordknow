@@ -245,11 +245,17 @@ class LearningStatus(CreatedUpdateBaseModel):
         self.save(update_fields=('repetition_notified',))
 
     @atomic()
-    def set_complete_repetition_words(self):
+    def set_complete_repetition_words(self, with_last_repeated=False):
         next_repeat_word_status = self.get_next_repeat_word_status()
         last_repeat_id = next_repeat_word_status and next_repeat_word_status.id or float('Inf')
 
-        update_repeat_words = filter(lambda w: w.id < last_repeat_id, self.repeat_words.all())
+        def filter_last_repeated_words(w: WordStatus):
+            return w.id < last_repeat_id
+
+        if with_last_repeated:
+            def filter_last_repeated_words(w: WordStatus): return w.id <= last_repeat_id
+
+        update_repeat_words = filter(filter_last_repeated_words, self.repeat_words.all())
         now = get_datetime_now()
         for word_status in update_repeat_words:
             word_status.set_next_repetition_time(now)
