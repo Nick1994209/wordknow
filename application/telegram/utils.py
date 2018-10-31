@@ -8,8 +8,8 @@ from app.models import User
 from app.utils import retry_if_false, safe_str
 from telegram.exceptions import SendMessageException
 
+from . import constants
 from .bot import bot
-from .constants import Commands, Emogies, Handlers
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ def generate_markup(*items):
 
 
 def get_learn_repeat_markup():
-    return generate_markup(Handlers.learn_words.path, Handlers.repetition.path)
+    return generate_markup(constants.Handlers.learn_words.path, constants.Handlers.repetition.path)
 
 
 def get_user(message: telebot.types.Message):
@@ -102,7 +102,9 @@ def get_success_text() -> str:
 #     @atomic()
 #     def handle(self, message: telebot.types.Message):
 #         self.user.update_status(User.Status.LEARNING)
-#         send_message(self.user, 'Изучать слова это здоворо! Приступим!' + constants.Emogies.astronaut)
+#         send_message(
+#             self.user, 'Изучать слова это здоворо! Приступим!' + constants.Emogies.astronaut,
+#         )
 #         self.user.learning_status.repeat_words.clear()
 #         LearningWord.choice_next_word(self.user)
 #

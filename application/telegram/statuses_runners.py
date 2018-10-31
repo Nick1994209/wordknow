@@ -7,7 +7,7 @@ from django.db.transaction import atomic
 from app.models import User, WordStatus
 from app.utils import get_datetime_now
 from telegram import constants
-from telegram.utils import send_message, get_success_text, get_learn_repeat_markup, generate_markup
+from telegram.utils import generate_markup, get_learn_repeat_markup, get_success_text, send_message
 
 logger = logging.getLogger(__name__)
 
@@ -107,25 +107,29 @@ class RepeatWord(BaseRunner):
         self.user.update_status(User.Status.REPETITION)
 
         send_message(self.user, 'Повторять слова это здоворо! Приступим! Введите перевод:')
-        learning_status = self.user.learning_status
         # all repeated words set how repeated =)
-        learning_status.set_complete_repetition_words(with_last_repeated=True)
-
-        repetition_words = WordStatus.objects.filter(
-            user=self.user, start_repetition_time__lt=get_datetime_now(),
-        ).exclude(
-            id__in=[status_word.id for status_word in learning_status.repeat_words.all()],
-        )
-        self.user.learning_status.repeat_words.add(*repetition_words)
-
+        self.user.learning_status.set_complete_repetition_words(with_last_repeated=True)
+        self.set_repetition_words()
+        self.repeat(start_repetition=True)
 
     @atomic
     def run(self, is_first_run=False):
         if self.guess():
             self.repeat()
 
+    def set_repetition_words(self):
+        repetition_words = WordStatus.objects.filter(
+            user=self.user, start_repetition_time__lt=get_datetime_now(),
+        ).exclude(
+            id__in=[status_word.id for status_word in self.user.learning_status.repeat_words.all()],
+        )
+        self.user.learning_status.repeat_words.add(*repetition_words)
+
     def repeat(self, start_repetition=False):
-        # start_repetition - если мы только начинаем повторять слова, то ставит в True
+        """ Repeat word (send message to telegram)
+
+        :param start_repetition: если мы только начинаем повторять слова, то ставит в True
+        """
         learning_status = self.user.learning_status
 
         next_word_status = learning_status.get_next_repeat_word_status(start_repetition)
@@ -155,7 +159,8 @@ class RepeatWord(BaseRunner):
             return True
 
         repetition_word_status.increase_not_guess()
-        text = '%s \n Повторение - мать учения %s! \n Пожалуйста, напишите translate слова: "%s"' % (
+        text = '%s \n Повторение - мать учения %s! \n Пожалуйста, напишите translate слова: "%s"'
+        text = text % (
             repetition_word_status.word,
             constants.Emogies.astonished,
             repetition_word_status.get_word_for_translating(),

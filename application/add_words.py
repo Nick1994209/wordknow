@@ -39,7 +39,6 @@ def set_words(file_path, split, user=None):
 
 
 def args_parser():
-
     parser = ArgumentParser(fromfile_prefix_chars='@')
     parser.add_argument('-f', '--file_path')
     parser.add_argument('-u', '--user')
@@ -53,10 +52,6 @@ def args_parser():
             args[arg_name] = getattr(parsed_args, arg_name)
 
     return args
-
-
-def a(**kwargs):
-    print(kwargs)
 
 
 if __name__ == '__main__':

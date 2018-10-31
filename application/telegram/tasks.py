@@ -2,8 +2,8 @@ import logging
 
 from app.models import User
 from app.utils import get_datetime_now
-from telegram.constants import Handlers
-from telegram.utils import generate_markup, safe_send_message
+from telegram import constants
+from telegram.utils import generate_markup, get_learn_repeat_markup, safe_send_message
 
 logger = logging.getLogger('telegram_tasks')
 
@@ -24,12 +24,11 @@ def notify_repetition():
 
     logger.info('get users %d', users.count())
 
-    markup = generate_markup(Handlers.repetition.path)
     for user in users.iterator():
         safe_send_message(
             user,
             'Hello my friend! Do you want to repetition new words?',
-            markup=markup,
+            markup=generate_markup(constants.Handlers.repetition.path),
         )
         user.learningstatus.update_notification_time(get_datetime_now())
 
@@ -43,12 +42,11 @@ def notify_learning():
         logger.info('End (time) notify_learning')
         return
 
-    markup = generate_markup(Handlers.learn_words.path, Handlers.repetition.path)
     for user in User.objects.iterator():
         safe_send_message(
             user,
             'Hi! I want to suggest learning new words) Давай, изучи пару слов!',
-            markup=markup,
+            markup=get_learn_repeat_markup(),
         )
     logger.info('End notify_learning')
 

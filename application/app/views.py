@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.http import HttpResponseRedirect
-from django.views.generic import TemplateView, FormView, ListView
+from django.views.generic import FormView, ListView, TemplateView
 
 from app import forms
 from app.mixins import AuthenticationMixin, TemplateFormMixin

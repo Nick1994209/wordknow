@@ -41,3 +41,13 @@ http://wordknow.ml
     # you can add proxy
     #http_proxy=host:port
     #https_proxy=host:port
+
+
+###### Run before commit!
+
+    flake8
+    isort
+
+###### use pipdeptree for get pip requirements
+
+    pipdeptree -fl

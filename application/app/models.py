@@ -6,7 +6,6 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.db.transaction import atomic
-from django.utils import timezone
 from django.utils.functional import cached_property
 
 from app.utils import get_datetime_now, safe_str
@@ -58,11 +57,11 @@ class User(CreatedUpdateBaseModel):
     @cached_property
     def learning_status(self) -> 'LearningStatus':
         status = (
-            LearningStatus.objects.
-                filter(user_id=self.id).
-                prefetch_related('repeat_words').
-                select_related('repetition_word_status').
-                first()
+            LearningStatus.objects
+            .filter(user_id=self.id)
+            .prefetch_related('repeat_words')
+            .select_related('repetition_word_status')
+            .first()
         )
         if not status:
             status = LearningStatus.objects.create(user_id=self.id)
@@ -253,7 +252,8 @@ class LearningStatus(CreatedUpdateBaseModel):
             return w.id < last_repeat_id
 
         if with_last_repeated:
-            def filter_last_repeated_words(w: WordStatus): return w.id <= last_repeat_id
+            def filter_last_repeated_words(w: WordStatus):
+                return w.id <= last_repeat_id
 
         update_repeat_words = filter(filter_last_repeated_words, self.repeat_words.all())
         now = get_datetime_now()

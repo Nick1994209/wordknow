@@ -21,10 +21,6 @@ env_file_path = os.path.join(BASE_DIR, '../environments.env')
 if os.path.exists(env_file_path):
     load_dotenv(dotenv_path=env_file_path, verbose=True)
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import pytz
-from django.utils import timezone
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 

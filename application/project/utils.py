@@ -12,13 +12,15 @@ def run_retrying_connect_to_db():
     db_conn = connections['default']
 
     counter = 0
+
+    conn_exception = Exception('Can not connect to db')
     while counter < settings.COUNT_TRIES_CONNECT:
         log.info('Try connect to DB: %s', counter)
         try:
             return db_conn.cursor()
         except OperationalError as e:
-            pass
+            conn_exception = e
         counter += 1
         time.sleep(settings.SLEEP_TIME)
 
-    raise e
+    raise conn_exception

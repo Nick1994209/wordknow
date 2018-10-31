@@ -1,4 +1,5 @@
 from django import forms
+
 from app.models import User
 
 
@@ -50,7 +51,7 @@ class WordsForm(forms.Form):
         return translates
 
     def is_first_run(self):
-        return self.cleaned_data['first_run'] == True
+        return self.cleaned_data['first_run'] is True
 
     def set_readonly(self):
         for _, field in self.fields.items():

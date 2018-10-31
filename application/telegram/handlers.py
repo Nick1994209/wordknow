@@ -1,18 +1,18 @@
 import logging
 import time
 
-from django.db.transaction import atomic
 import telebot
+from django.db.transaction import atomic
 
 from app.models import User, Word
 from project import settings
 from telegram.utils import send_message
 
+from . import constants
 from .bot import bot
 from .botan import botan_track
-from . import constants
+from .statuses_runners import LearnWordRunner, RepeatWord, get_learn_repeat_markup
 from .utils import get_user
-from .statuses_runners import (get_learn_repeat_markup, LearnWordRunner, RepeatWord)
 
 logger = logging.getLogger('telegram_handlers')
 
