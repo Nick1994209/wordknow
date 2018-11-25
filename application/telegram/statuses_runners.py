@@ -106,36 +106,29 @@ class RepeatWord(BaseRunner):
     def first_run(self):
         self.user.update_status(User.Status.REPETITION)
 
-        send_message(self.user, 'Повторять слова это здоворо! Приступим! Введите перевод:')
-        # all repeated words set how repeated =)
-        self.user.learning_status.set_complete_repetition_words(with_last_repeated=True)
-        self.set_repetition_words()
+        self.user.learning_status.update_repetition_time_for_repeated_words(with_last_repeated=True)
+        self.user.learning_status.reset_repeated_words()
+        self.user.learningstatus.add_words_for_repetition()
+
         self.repeat(start_repetition=True)
 
     @atomic
-    def run(self, is_first_run=False):
+    def run(self):
         if self.guess():
             self.repeat()
-
-    def set_repetition_words(self):
-        repetition_words = WordStatus.objects.filter(
-            user=self.user, start_repetition_time__lt=get_datetime_now(),
-        ).exclude(
-            id__in=[status_word.id for status_word in self.user.learning_status.repeat_words.all()],
-        )
-        self.user.learning_status.repeat_words.add(*repetition_words)
 
     def repeat(self, start_repetition=False):
         """ Repeat word (send message to telegram)
 
-        :param start_repetition: если мы только начинаем повторять слова, то ставит в True
+        :param start_repetition: если мы только начинаем повторять слова, то ставим в True
         """
         learning_status = self.user.learning_status
 
         next_word_status = learning_status.get_next_repeat_word_status(start_repetition)
         if not next_word_status:
             learning_status.update_notification_time(None)
-            learning_status.set_complete_repetition_words()
+            learning_status.update_repetition_time_for_repeated_words(with_last_repeated=True)
+            learning_status.reset_repeated_words()
 
             send_message(
                 self.user,
@@ -144,6 +137,9 @@ class RepeatWord(BaseRunner):
             )
             self.user.update_status(User.Status.FREE)
             return
+
+        if start_repetition:
+            send_message(self.user, 'Повторять слова это здоворо! Приступим! Введите перевод:')
 
         learning_status.set_repetition_word_status_id(next_word_status.id)
         send_message(self.user, next_word_status.get_word_for_translating())
@@ -159,11 +155,15 @@ class RepeatWord(BaseRunner):
             return True
 
         repetition_word_status.increase_not_guess()
-        text = '%s \n Повторение - мать учения %s! \n Пожалуйста, напишите translate слова: "%s"'
+        text = ('%s\n'
+                'Повторение - мать учения %s!\n'
+                ' Пожалуйста, напишите translate слова: "%s"\n'
+                '  Если вы не хотите больше повторять слово: %s')
         text = text % (
             repetition_word_status.word,
             constants.Emogies.astonished,
             repetition_word_status.get_word_for_translating(),
+            constants.Handlers.delete_word.path,
         )
 
         send_message(self.user, text)

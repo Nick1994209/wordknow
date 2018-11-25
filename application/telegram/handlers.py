@@ -61,6 +61,27 @@ def repeat_words_handler(message: telebot.types.Message):
     RepeatWord(message=message, user=user).first_run()
 
 
+@bot.message_handler(commands=[constants.Handlers.delete_word.handler])
+@botan_track
+def delete_word_handler(message: telebot.types.Message):
+    user = get_user(message)
+
+    if not user.status_is_repetition():
+        send_message(user, 'Не понятна :( что Вы хотите? ' + constants.Handlers.help.path)
+
+    # так себе решение, потом... возможно, никогда... переделать
+    word_status = user.learning_status.repetition_word_status
+    if word_status:
+        text = 'Прощай "%s".' % word_status
+        send_message(user, text)
+        word_status.next_repetition_time = None
+        word_status.save()
+        # удаляем из слов для повторения
+        user.learning_status.repeat_words.remove(word_status)
+
+    RepeatWord(message=message, user=user).first_run()
+
+
 @bot.message_handler(commands=[constants.Handlers.stop.handler])
 @botan_track
 @atomic

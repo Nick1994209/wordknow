@@ -79,7 +79,8 @@ class User(CreatedUpdateBaseModel):
 
     def perform_last_status_actions(self, old_status):
         if old_status == self.Status.REPETITION:
-            self.learning_status.set_complete_repetition_words()
+            self.learning_status.update_repetition_time_for_repeated_words()
+            self.learning_status.reset_repeated_words()
 
     def status_is_free(self):
         return self.status == self.Status.FREE
@@ -151,7 +152,11 @@ class WordStatus(CreatedUpdateBaseModel):
 
     @property
     def is_conversely(self):
-        # служит что бы показать, мы будем угадывать слово или перевод
+        """
+        Проверка статуса слова "наобарот"
+
+        служит что бы показать, мы будем угадывать слово или перевод
+        """
         return self.count_repetitions % 2
 
     def is_word_guessed(self, message: str):
@@ -243,20 +248,28 @@ class LearningStatus(CreatedUpdateBaseModel):
         self.repetition_notified = set_time
         self.save(update_fields=('repetition_notified',))
 
+    def reset_repeated_words(self):
+        self.repeat_words.clear()
+
     @atomic()
-    def set_complete_repetition_words(self, with_last_repeated=False):
+    def update_repetition_time_for_repeated_words(self, with_last_repeated=False):
         next_repeat_word_status = self.get_next_repeat_word_status()
         last_repeat_id = next_repeat_word_status and next_repeat_word_status.id or float('Inf')
 
-        def filter_last_repeated_words(w: WordStatus):
+        def check_words_was_repeated(w: WordStatus):
+            if with_last_repeated:
+                return w.id <= last_repeat_id
             return w.id < last_repeat_id
 
-        if with_last_repeated:
-            def filter_last_repeated_words(w: WordStatus):
-                return w.id <= last_repeat_id
-
-        update_repeat_words = filter(filter_last_repeated_words, self.repeat_words.all())
+        repeat_words = filter(check_words_was_repeated, self.repeat_words.all())
         now = get_datetime_now()
-        for word_status in update_repeat_words:
+        for word_status in repeat_words:
             word_status.set_next_repetition_time(now)
-        self.repeat_words.clear()
+
+    def add_words_for_repetition(self):
+        repetition_words = WordStatus.objects.filter(
+            user=self.user, start_repetition_time__lt=get_datetime_now(),
+        ).exclude(
+            id__in=[status_word.id for status_word in self.user.learning_status.repeat_words.all()],
+        )
+        self.repeat_words.add(*repetition_words)
