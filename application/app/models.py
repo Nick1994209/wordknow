@@ -216,10 +216,9 @@ class LearningStatus(CreatedUpdateBaseModel):
 
     def get_next_repeat_word_status(self, start_repetition=False) -> typing.Union[WordStatus, None]:
 
-        if start_repetition:
-            repetition_word_status_id = 0
-        else:
-            repetition_word_status_id = self.repetition_word_status_id or 0
+        repetition_word_status_id = 0
+        if self.repetition_word_status_id and not start_repetition:
+            repetition_word_status_id = self.repetition_word_status_id
 
         next_repeat_words = filter(
             lambda x: x.id > repetition_word_status_id, self.repeat_words.all(),
