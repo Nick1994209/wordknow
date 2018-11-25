@@ -3,7 +3,8 @@ from functools import wraps
 from time import sleep
 
 import pytz
-from django.utils import timezone
+from django.core.management import BaseCommand
+from django.utils import timezone, autoreload
 
 from project import settings
 
@@ -70,3 +71,11 @@ def safe_str(obj):
         except Exception:
             return ""
     return obj
+
+
+class BaseCommandWithAutoreload(BaseCommand):
+    def handle(self, *args, **options):
+        autoreload.main(self.main)
+
+    def main(self):
+        pass

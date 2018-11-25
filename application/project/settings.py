@@ -163,19 +163,25 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGS_PATH, 'debug.log'),
+            'filename': os.path.join(LOGS_PATH, 'base_debug.log'),
+            'formatter': 'verbose',
+        },
+        'telegram': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_PATH, 'telegram.log'),
             'formatter': 'verbose',
         },
         'telegram_tasks': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGS_PATH, 'telegram_tasks.debug.log'),
+            'filename': os.path.join(LOGS_PATH, 'telegram_tasks.log'),
             'formatter': 'verbose',
         },
         'telegram_handlers': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGS_PATH, 'telegram_handlers.debug.log'),
+            'filename': os.path.join(LOGS_PATH, 'telegram_handlers.log'),
             'formatter': 'verbose',
         },
     },
@@ -184,21 +190,21 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
-        'telegram': {
-            'handlers': ['console', 'file'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-        },
         'app': {
             'handlers': ['console', 'file'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
+        },
+        'telegram': {
+            'handlers': ['console', 'telegram'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
         },
         'telegram_tasks': {
             'handlers': ['console', 'telegram_tasks'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
         },
         'telegram_handlers': {
             'handlers': ['console', 'telegram_handlers'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
         },
     },
 }
