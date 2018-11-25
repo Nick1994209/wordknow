@@ -60,7 +60,7 @@ class User(CreatedUpdateBaseModel):
             LearningStatus.objects
             .filter(user_id=self.id)
             .prefetch_related('repeat_words')
-            .select_related('repetition_word_status')
+            .select_related('repetition_word_status', 'learn_word')
             .first()
         )
         if not status:
@@ -219,7 +219,7 @@ class LearningStatus(CreatedUpdateBaseModel):
         if start_repetition:
             repetition_word_status_id = 0
         else:
-            repetition_word_status_id = self.repetition_word_status_id
+            repetition_word_status_id = self.repetition_word_status_id or 0
 
         next_repeat_words = filter(
             lambda x: x.id > repetition_word_status_id, self.repeat_words.all(),
