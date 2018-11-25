@@ -158,7 +158,7 @@ class RepeatWord(BaseRunner):
         text = ('%s\n'
                 'Повторение - мать учения %s!\n'
                 ' Пожалуйста, напишите translate слова: "%s"\n'
-                '  Если вы не хотите больше повторять слово: %s')
+                '   Вы можете удалить последнее повторенное слово: %s')
         text = text % (
             repetition_word_status.word,
             constants.Emogies.astonished,
