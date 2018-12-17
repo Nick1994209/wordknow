@@ -202,6 +202,9 @@ class LearningStatus(CreatedUpdateBaseModel):
         self.repetition_word_status_id = word_status_id
         self.save(update_fields=('repetition_word_status_id',))
 
+    def reset_repetition_word_status(self):
+        self.set_repetition_word_status_id(None)
+
     @property
     def next_learn_word(self) -> typing.Union[Word, None]:
         from_word_id = self.learn_word_id or 0
@@ -249,6 +252,7 @@ class LearningStatus(CreatedUpdateBaseModel):
 
     def reset_repeated_words(self):
         self.repeat_words.clear()
+        self.reset_repetition_word_status()
 
     @atomic()
     def update_repetition_time_for_repeated_words(self, with_last_repeated=False):

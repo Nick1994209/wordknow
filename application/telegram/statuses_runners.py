@@ -33,6 +33,11 @@ class LearnWordRunner(BaseRunner):
         send_message(
             self.user, 'Изучать слова это здоворо! Приступим!' + constants.Emogies.astronaut,
         )
+
+        # TODO по-хорошему объединить update_repetition_time_for_repeated_words и reset_repeated_words
+        # в одну функцию
+        self.user.learning_status.update_repetition_time_for_repeated_words(with_last_repeated=True)
+        self.user.learning_status.reset_repeated_words()
         self.choice_next_word()
 
     @atomic
@@ -88,8 +93,10 @@ class LearnWordRunner(BaseRunner):
             )
             self.user.learning_status.repeat_words.add(ws)
             self.user.learning_status.set_next_learn_word()
+            return True
         elif message_text == constants.Commands.miss:
             self.user.learning_status.set_next_learn_word()
+            return True
         else:
             send_message(
                 self.user, 'Не понятное сообщение. Вы хотите выучить слово?',
@@ -98,7 +105,6 @@ class LearnWordRunner(BaseRunner):
                 ),
             )
             return False
-        return True
 
 
 class RepeatWord(BaseRunner):
