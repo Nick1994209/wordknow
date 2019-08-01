@@ -14,18 +14,20 @@ logger = logging.getLogger(__name__)
 
 
 class Botan:
-    @retry_if_false(attempts_count=3, sleep_time=0.01)
     @classmethod
+    @retry_if_false(attempts_count=3, sleep_time=0.01)
     def track(cls, uid, message, name='Message'):
-        if not settings.BOTAN_API_KEY:
-            return
+        botan_key = cls.get_botan_key()
+        if not botan_key:
+            logger.debug('botan key is not defined')
+            return True
 
         msg = cls.make_json(message)
 
         try:
             r = requests.post(
                 TRACK_URL,
-                params={"token": settings.BOTAN_API_KEY, "uid": uid, "name": name},
+                params={"token": botan_key, "uid": uid, "name": name},
                 data=msg,
                 headers={'Content-type': 'application/json'},
             )
@@ -50,6 +52,10 @@ class Botan:
         if message.from_user.username is not None:
             data['from']['username'] = message.from_user.username
         return data
+
+    @staticmethod
+    def get_botan_key():
+        return settings.BOTAN_API_KEY
 
 
 def botan_track(func):

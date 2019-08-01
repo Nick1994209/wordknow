@@ -29,22 +29,23 @@ class WordsForm(forms.Form):
     splitter = forms.CharField(label='Знак разделения слова с переводом')
     first_run = forms.NullBooleanField(widget=forms.HiddenInput())
 
-    def clean_splitter(self):
+    @property
+    def _splitter(self):
         return self.cleaned_data['splitter'].replace('\\t', '\t')
 
     def get_without_trash_words(self):
-        splitter = self.cleaned_data['splitter']
         lines = [
-            '{text}{splitter}{translate}'.format(text=text, splitter=splitter, translate=translate)
+            f'{text}{self._splitter}{translate}'
             for text, translate in self.get_translates()
         ]
         return '\n'.join(lines)
 
     def get_translates(self):
         translates = []
-        splitter = self.cleaned_data['splitter']
         for line in self.cleaned_data['words'].splitlines():
-            split_line = line.split(splitter)
+            split_line = line.strip().split(self._splitter)
+            split_line = list(filter(bool, split_line))
+
             if len(split_line) != 2:
                 continue
 
