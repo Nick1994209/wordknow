@@ -1,20 +1,26 @@
-#psycopg2==2.7.4
-
-Django==2.0.3
-  pytz==2018.3
+beautifulsoup4==4.6.3
+Django==2.2.3
+  pytz==2019.2
+  sqlparse==0.3.0
+django-crispy-forms==1.7.2
+flake8==3.6.0
+  mccabe==0.6.1
+  pycodestyle==2.4.0
+  pyflakes==2.0.0
+  setuptools==40.5.0
 gTTS==1.2.2
   gTTS-token==1.1.1
-    requests==2.18.4
-      certifi==2018.1.18
+    requests==2.22.0
+      certifi==2019.6.16
       chardet==3.0.4
-      idna==2.6
-      urllib3==1.22
-  requests==2.18.4
-    certifi==2018.1.18
+      idna==2.8
+      urllib3==1.25.3
+  requests==2.22.0
+    certifi==2019.6.16
     chardet==3.0.4
-    idna==2.6
-    urllib3==1.22
-  six==1.11.0
+    idna==2.8
+    urllib3==1.25.3
+  six==1.12.0
 gunicorn==19.7.1
 ipython==6.2.1
   appnope==0.1.0
@@ -25,38 +31,26 @@ ipython==6.2.1
     ptyprocess==0.5.2
   pickleshare==0.7.4
   prompt-toolkit==1.0.15
-    six==1.11.0
+    six==1.12.0
     wcwidth==0.1.7
   Pygments==2.2.0
-  setuptools==28.8.0
+  setuptools==40.5.0
   simplegeneric==0.8.1
   traitlets==4.3.2
     decorator==4.2.1
     ipython-genutils==0.2.0
-    six==1.11.0
+    six==1.12.0
 isort==4.3.4
-Pillow==5.1.0
+Pillow==6.1.0
 pipdeptree==0.13.0
   pip==9.0.1
-# psycopg2==2.7.4
-psycopg2-binary==2.7.4
-pyTelegramBotAPI==3.6.2
-  requests==2.18.4
-    certifi==2018.1.18
+psycopg2-binary==2.8.3
+pyTelegramBotAPI==3.6.6
+  requests==2.22.0
+    certifi==2019.6.16
     chardet==3.0.4
-    idna==2.6
-    urllib3==1.22
-  six==1.11.0
+    idna==2.8
+    urllib3==1.25.3
+  six==1.12.0
 python-dotenv==0.8.2
 schedule==0.5.0
-# bootstrap4 beauty forms
-django-crispy-forms==1.7.2
-beautifulsoup4==4.6.3
-
-# dev
-isort==4.3.4
-flake8==3.6.0
-  mccabe==0.6.1
-  pycodestyle==2.4.0
-  pyflakes==2.0.0
-  setuptools==40.5.0

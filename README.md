@@ -51,3 +51,7 @@ http://wordknow.ml
 ###### use pipdeptree for get pip requirements
 
     pipdeptree -fl
+
+###### pillow requiremenents
+
+    brew install libjpeg
