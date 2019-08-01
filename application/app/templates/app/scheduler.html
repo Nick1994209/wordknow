@@ -20,26 +20,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>20 минут</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>1 час</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>6 часов</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>1 день</td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td>3 день</td>
-                </tr>
+                    {% for number, repetition_time in repetition_times.items %}
+                        <tr>
+                            <td>{{ number }}</td>
+                            <td>{{ repetition_time }}</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

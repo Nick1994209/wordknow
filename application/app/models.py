@@ -82,13 +82,16 @@ class User(CreatedUpdateBaseModel):
             self.learning_status.update_repetition_time_for_repeated_words()
             self.learning_status.reset_repeated_words()
 
-    def status_is_free(self):
+    @property
+    def is_free(self):
         return self.status == self.Status.FREE
 
-    def status_is_learning(self):
+    @property
+    def is_learning(self):
         return self.status == self.Status.LEARNING
 
-    def status_is_repetition(self):
+    @property
+    def is_repetition(self):
         return self.status == self.Status.REPETITION
 
     def generate_auth_code(self):
@@ -108,11 +111,11 @@ class Word(CreatedUpdateBaseModel):
                              null=True, verbose_name='Cлово пользователя')
 
     def __str__(self):
-        return self.text + ' - ' + self.translate
+        return f'{self.text} - {self.translate}'
 
     @property
     def learn_text(self):
-        return self.text + ' - ' + self.translate
+        return f'{self.text} - {self.translate}'
 
 
 class WordStatus(CreatedUpdateBaseModel):
@@ -128,7 +131,7 @@ class WordStatus(CreatedUpdateBaseModel):
         ordering = ('id',)
 
     def __str__(self):
-        return self.user.username + ' ' + self.word.text
+        return f'{self.user.username}: {self.word.text}'
 
     def increase_not_guess(self):
         self.number_not_guess += 1
@@ -206,7 +209,7 @@ class LearningStatus(CreatedUpdateBaseModel):
         self.set_repetition_word_status_id(None)
 
     @property
-    def next_learn_word(self) -> typing.Union[Word, None]:
+    def next_learn_word(self) -> typing.Optional[Word]:
         from_word_id = self.learn_word_id or 0
 
         # if user added words => return user word; else return general word
@@ -217,7 +220,7 @@ class LearningStatus(CreatedUpdateBaseModel):
         logger.debug('User=%s without words', self.user_id)
         return Word.objects.filter(user=None, id__gt=from_word_id).first()
 
-    def get_next_repeat_word_status(self, start_repetition=False) -> typing.Union[WordStatus, None]:
+    def get_next_repeat_word_status(self, start_repetition=False) -> typing.Optional[WordStatus]:
 
         repetition_word_status_id = 0
         if self.repetition_word_status_id and not start_repetition:
@@ -270,9 +273,11 @@ class LearningStatus(CreatedUpdateBaseModel):
             word_status.set_next_repetition_time(now)
 
     def add_words_for_repetition(self):
-        repetition_words = WordStatus.objects.filter(
-            user=self.user, start_repetition_time__lt=get_datetime_now(),
-        ).exclude(
-            id__in=[status_word.id for status_word in self.user.learning_status.repeat_words.all()],
+        repetition_words = (
+            WordStatus.objects
+            .filter(user=self.user, start_repetition_time__lt=get_datetime_now())
+            .exclude(id__in=[
+                status_word.id for status_word in self.user.learning_status.repeat_words.all()
+            ])
         )
         self.repeat_words.add(*repetition_words)

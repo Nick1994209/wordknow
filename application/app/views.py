@@ -15,9 +15,10 @@ class IndexView(AuthenticationMixin, TemplateView):
     extra_context = {'bot_name': settings.TELEGRAM_BOT_NAME}
 
 
-class AboutBotView(AuthenticationMixin, TemplateView):
-    template_name = 'app/about_bot.html'
-    extra_context = {'bot_name': settings.TELEGRAM_BOT_NAME}
+class SchedulerView(AuthenticationMixin, TemplateView):
+    template_name = 'app/scheduler.html'
+    extra_context = {'bot_name': settings.TELEGRAM_BOT_NAME,
+                     'repetition_times': settings.REPETITION_TIMES}
 
 
 class EnterLoginView(AuthenticationMixin, TemplateFormMixin, FormView):
@@ -48,7 +49,7 @@ class LoginView(AuthenticationMixin, TemplateFormMixin, FormView):
     button_name = 'Вход'
 
     def get_initial(self):
-        return {'user': self.request.GET.get('user')}
+        return {'user': self.request.GET.get('user', '')}
 
     def form_valid(self, form):
         if not self.authenticate(form.cleaned_data['user'], form.cleaned_data['auth_code']):

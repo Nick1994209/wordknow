@@ -9,6 +9,7 @@ log = logging.getLogger(__name__)
 
 
 def run_retrying_connect_to_db():
+    logging.basicConfig(level=logging.DEBUG)
     db_conn = connections['default']
 
     counter = 0

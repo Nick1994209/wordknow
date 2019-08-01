@@ -66,7 +66,7 @@ def repeat_words_handler(message: telebot.types.Message):
 def delete_word_handler(message: telebot.types.Message):
     user = get_user(message)
 
-    if not user.status_is_repetition():
+    if not user.is_repetition:
         send_message(user, 'Не понятна :( что Вы хотите? ' + constants.Handlers.help.path)
 
     word_status = user.learning_status.repetition_word_status
@@ -93,11 +93,11 @@ def stop_handler(message: telebot.types.Message):
 @botan_track
 def text_handler(message: telebot.types.Message):
     user = get_user(message)
-    if user.status_is_free():
+    if user.is_free:
         send_message(user, 'Не понятна :( что Вы хотите? ' + constants.Handlers.help.path)
-    elif user.status_is_learning():
+    elif user.is_learning:
         LearnWordRunner(message=message, user=user).run()
-    elif user.status_is_repetition():
+    elif user.is_repetition:
         RepeatWord(message=message, user=user).run()
     else:
         raise Exception('User status not found: %s', user.status)

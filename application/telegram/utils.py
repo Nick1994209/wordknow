@@ -52,9 +52,13 @@ def get_user(message: telebot.types.Message):
         user, _ = User.objects.get_or_create(
             chat_id=message.chat.id, username=message.from_user.username,
         )
-    except Exception as e:
+    except User.DoesNotFound as e:
+
         logger.exception(e)
+        # типо пользователь уже существует, но с другим именем. зато chat_id неизменился
         user = User.objects.get(chat_id=message.chat.id)
+        user.username = message.from_user.username
+        user.save(update_fields=('username',))
     return user
 
 

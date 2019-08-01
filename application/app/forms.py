@@ -26,7 +26,7 @@ class WordsForm(forms.Form):
         label='Слова', widget=forms.Textarea(), max_length=150000, required=False,
         help_text='Добавляйте слова разделяя слово с переводом знаком разделения. '
                   'С переносом строки можно добавить еще слова с переводом. Пример: "hello;привет"')
-    splitter = forms.CharField(label='Знак разделения слова с переводом')
+    splitter = forms.CharField(label='Знак разделения слова с переводом', empty_value=' ')
     first_run = forms.NullBooleanField(widget=forms.HiddenInput())
 
     @property

@@ -18,8 +18,19 @@
     {% endif %}
 
     <ul class="list-group">
+        <li class="list-group-item font-weight-bold list-group-item-secondary">
+            <span>Слово - перевод</span>
+            <span class="float-right">
+                Дата создания
+            </span>
+        </li>
         {% for word in object_list %}
-            <li class="list-group-item">{{ word }}</li>
+            <li class="list-group-item">
+                <span>{{ word }}</span>
+                <span class="float-right">
+                    {{ word.date_created }}
+                </span>
+            </li>
         {% endfor %}
     </ul>
 {% endblock %}

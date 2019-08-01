@@ -27,7 +27,7 @@ def notify_repetition():
     for user in users.iterator():
         safe_send_message(
             user,
-            'Hello my friend! Do you want to repetition new words?',
+            'Hello, my friend! Do you want to repeat new words?',
             markup=generate_markup(constants.Handlers.repetition.path),
         )
         user.learningstatus.update_notification_time(get_datetime_now())

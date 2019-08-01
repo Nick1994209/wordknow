@@ -114,7 +114,7 @@ class RepeatWord(BaseRunner):
 
         self.user.learning_status.update_repetition_time_for_repeated_words(with_last_repeated=True)
         self.user.learning_status.reset_repeated_words()
-        self.user.learningstatus.add_words_for_repetition()
+        self.user.learning_status.add_words_for_repetition()
 
         self.repeat(start_repetition=True)
 
@@ -162,9 +162,9 @@ class RepeatWord(BaseRunner):
 
         repetition_word_status.increase_not_guess()
         text = ('%s\n'
-                'Повторение - мать учения %s!\n'
+                # 'Повторение - мать учения %s!\n'
                 ' Пожалуйста, напишите translate слова: "%s"\n'
-                '   Вы можете удалить последнее повторенное слово: %s')
+                ' Вы можете удалить это слово: %s')
         text = text % (
             repetition_word_status.word,
             constants.Emogies.astonished,

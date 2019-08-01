@@ -7,7 +7,7 @@ def main():
     proxy = get_https_proxy()
 
     with open(env_file, 'a') as f:
-        f.write('https_proxy=%s' % proxy)
+        f.write(f'https_proxy={proxy}')
 
 
 def get_https_proxy(body_proxy=None):
