@@ -75,7 +75,7 @@ def safe_str(obj):
 
 class BaseCommandWithAutoreload(BaseCommand):
     def handle(self, *args, **options):
-        autoreload.main(self.main)
+        autoreload.run_with_reloader(self.main)
 
     def main(self):
         pass

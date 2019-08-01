@@ -3,7 +3,7 @@ echo "https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with
 
 echo "START"
 apt-get update
-apt-get install git -y
+apt-get install git nano -y
 
 mkdir /code
 cd /code
@@ -20,6 +20,7 @@ export LC_CTYPE="en_US.UTF-8"
 #dpkg-reconfigure locales
 
 echo "INSTALL REQUIREMENTS"
+cd wordknow
 pip3 install -r requirements.txt
 
 echo "SETUP POSTGRES"
