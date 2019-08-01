@@ -31,6 +31,7 @@ class WordsForm(forms.Form):
 
     def get_without_trash_words(self):
         splitter = self.cleaned_data['splitter']
+        splitter = splitter.replace('\\t', '\t')
         lines = [
             '{text}{splitter}{translate}'.format(text=text, splitter=splitter, translate=translate)
             for text, translate in self.get_translates()

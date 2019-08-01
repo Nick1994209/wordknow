@@ -1,4 +1,5 @@
 import logging
+from time import sleep
 
 import schedule
 
@@ -18,3 +19,4 @@ class Command(BaseCommandWithAutoreload):
                 schedule.run_pending()
             except Exception:
                 logger.exception('Scheduler tasks run: exception')
+            sleep(1)
