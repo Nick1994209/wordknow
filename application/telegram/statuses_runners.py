@@ -36,8 +36,9 @@ class LearnWordRunner(BaseRunner):
 
         # TODO по-хорошему объединить update_repetition_time_for_repeated_words и reset_repeated_words
         # в одну функцию
-        self.user.learning_status.update_repetition_time_for_repeated_words(with_last_repeated=True)
-        self.user.learning_status.reset_repeated_words()
+        # TODO проверить, что при смене статуса на learn увелич число повторений и сбрасываем счетчик
+        # self.user.learning_status.update_repetition_time_for_repeated_words(with_last_repeated=True)
+        # self.user.learning_status.reset_repeated_words()
         self.choice_next_word()
 
     @atomic
@@ -127,12 +128,23 @@ class RepeatWord(BaseRunner):
         """ Repeat word (send message to telegram)
 
         :param start_repetition: если мы только начинаем повторять слова, то ставим в True
+
+        если есть слово для повторения:
+            устанавливаем это слово как то, которое начали повторять
+            отправляем пользователю сообщение с этим словом
+
+        если нету слова для повторения:
+            указываем, что можно пинговать пользователя о повторении слов
+            обновляем время следующего повторения для повторенных слов
+               и удаляем их из тех которые сейчас нужно повторять
+            указываем, что нету следующего слова для повторения (ставим ему None)
+            переводим пользователя в статус: FREE
         """
         learning_status = self.user.learning_status
 
         next_word_status = learning_status.get_next_repeat_word_status(start_repetition)
         if not next_word_status:
-            learning_status.update_notification_time(None)
+            learning_status.update_notification_time(set_time=None)
             learning_status.update_repetition_time_for_repeated_words(with_last_repeated=True)
             learning_status.reset_repeated_words()
 

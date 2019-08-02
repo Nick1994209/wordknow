@@ -199,7 +199,7 @@ class LearningStatus(CreatedUpdateBaseModel):
 
     def set_repetition_word_status_id(self, word_status_id):
         logger.debug(
-            'LearningStatus update: user=%d next repetition_word_status_id=%d',
+            'LearningStatus update: user=%s next repetition_word_status_id=%s',
             self.user_id, word_status_id,
         )
         self.repetition_word_status_id = word_status_id
@@ -221,7 +221,10 @@ class LearningStatus(CreatedUpdateBaseModel):
         return Word.objects.filter(user=None, id__gt=from_word_id).first()
 
     def get_next_repeat_word_status(self, start_repetition=False) -> typing.Optional[WordStatus]:
-
+        """
+        Возвращает следующее слово для повторения
+        если больше нет слов для повторения => возвращает None
+        """
         repetition_word_status_id = 0
         if self.repetition_word_status_id and not start_repetition:
             repetition_word_status_id = self.repetition_word_status_id
@@ -260,11 +263,16 @@ class LearningStatus(CreatedUpdateBaseModel):
     @atomic()
     def update_repetition_time_for_repeated_words(self, with_last_repeated=False):
         next_repeat_word_status = self.get_next_repeat_word_status()
+        # если нету следующего слова для повторения -> все слова были повторены
+        # значит устанавливаем float(inf) - бесконечно большое число
         last_repeat_id = next_repeat_word_status and next_repeat_word_status.id or float('Inf')
 
         def check_words_was_repeated(w: WordStatus):
-            if with_last_repeated:
-                return w.id <= last_repeat_id
+            """
+            Проверка, что слово было повторено
+            """
+            # if with_last_repeated and self.repetition_word_status_id:
+            #     return w.id <= last_repeat_id
             return w.id < last_repeat_id
 
         repeat_words = filter(check_words_was_repeated, self.repeat_words.all())
@@ -276,7 +284,7 @@ class LearningStatus(CreatedUpdateBaseModel):
         repetition_words = (
             WordStatus.objects
             .filter(user=self.user, start_repetition_time__lt=get_datetime_now())
-            .exclude(id__in=[
+            .exclude(id__in=[  # исключаем добавленные слова
                 status_word.id for status_word in self.user.learning_status.repeat_words.all()
             ])
         )
