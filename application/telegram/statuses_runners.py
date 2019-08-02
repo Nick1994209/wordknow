@@ -162,12 +162,10 @@ class RepeatWord(BaseRunner):
 
         repetition_word_status.increase_not_guess()
         text = ('%s\n'
-                # 'Повторение - мать учения %s!\n'
                 ' Пожалуйста, напишите translate слова: "%s"\n'
                 ' Вы можете удалить это слово: %s')
         text = text % (
             repetition_word_status.word,
-            constants.Emogies.astonished,
             repetition_word_status.get_word_for_translating(),
             constants.Handlers.delete_word.path,
         )
