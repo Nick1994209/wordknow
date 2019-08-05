@@ -33,12 +33,6 @@ class LearnWordRunner(BaseRunner):
         send_message(
             self.user, 'Изучать слова это здоворо! Приступим!' + constants.Emogies.astronaut,
         )
-
-        # TODO по-хорошему объединить update_repetition_time_for_repeated_words и reset_repeated_words
-        # в одну функцию
-        # TODO проверить, что при смене статуса на learn увелич число повторений и сбрасываем счетчик
-        # self.user.learning_status.update_repetition_time_for_repeated_words(with_last_repeated=True)
-        # self.user.learning_status.reset_repeated_words()
         self.choice_next_word()
 
     @atomic
@@ -112,11 +106,7 @@ class RepeatWord(BaseRunner):
     @atomic
     def first_run(self):
         self.user.update_status(User.Status.REPETITION)
-
-        self.user.learning_status.update_repetition_time_for_repeated_words(with_last_repeated=True)
-        self.user.learning_status.reset_repeated_words()
         self.user.learning_status.add_words_for_repetition()
-
         self.repeat(start_repetition=True)
 
     @atomic
@@ -144,10 +134,6 @@ class RepeatWord(BaseRunner):
 
         next_word_status = learning_status.get_next_repeat_word_status(start_repetition)
         if not next_word_status:
-            learning_status.update_notification_time(set_time=None)
-            learning_status.update_repetition_time_for_repeated_words(with_last_repeated=True)
-            learning_status.reset_repeated_words()
-
             send_message(
                 self.user,
                 'My congratulations! Вы повторили все слова ' + constants.Emogies.fearful,

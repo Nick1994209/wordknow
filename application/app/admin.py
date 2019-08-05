@@ -18,7 +18,7 @@ class WordStatusAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_created'
     search_fields = ('user__username', 'word__text', 'word__translate')
     filter_fields = ('user',)
-    list_display = ('__str__', 'user', 'date_created', 'date_updated',)
+    list_display = ('__str__', 'user', 'date_created', 'date_updated', 'count_repetitions')
 
 
 @admin.register(LearningStatus)

@@ -8,8 +8,10 @@ echo ```BEFORE RUNNING SCRIPT generate pub key and set to github
 ```
 
 set -o errexit
-set -o verbose
+set -o xtrace
 set -o nounset
+
+test -e ~/.ssh/id_rsa.pub
 
 apt-get update
 apt-get install git nano docker docker-compose -y
@@ -32,8 +34,9 @@ rm /etc/nginx/nginx.conf
 cp eetc/nginx.wordknow.docker-compose /etc/nginx/nginx.conf
 nginx -t  # check nginx config is ok
 systemctl restart nginx
+# for nginx logs  $ tail -F /var/log/nginx/error.log
 
 ufw allow 'Nginx Full'
-# for nginx logs  $ tail -F /var/log/nginx/error.log
+ufw status
 
 nohup docker-compose up &

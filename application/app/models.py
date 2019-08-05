@@ -33,7 +33,7 @@ class User(CreatedUpdateBaseModel):
     class Status:
         FREE = 'free'
         LEARNING = 'learning'
-        REPETITION = 'learning_status'
+        REPETITION = 'repetition'
 
         CHOICES = (
             (FREE, 'в свободном плавании'),
@@ -68,19 +68,20 @@ class User(CreatedUpdateBaseModel):
         return status
 
     @atomic
-    def update_status(self, status):
-        logger.debug('User=%s update status from %s - %s', self.id, self.status, status)
-        if status == self.status:
+    def update_status(self, new_status):
+        logger.debug('User=%s update status from %s - %s', self.id, self.status, new_status)
+        if new_status == self.status:
             return
 
-        self.perform_last_status_actions(old_status=self.status)
-        self.status = status
+        self.perform_last_status_actions(old_status=self.status, new_status=new_status)
+        self.status = new_status
         self.save(update_fields=('status',))
 
-    def perform_last_status_actions(self, old_status):
+    def perform_last_status_actions(self, old_status, new_status):
+        old_status = self.Status.REPETITION
         if old_status == self.Status.REPETITION:
-            self.learning_status.update_repetition_time_for_repeated_words()
-            self.learning_status.reset_repeated_words()
+            self.learning_status.update_notification_time()
+            self.learning_status.clear_repeated_words()
 
     @property
     def is_free(self):
@@ -129,6 +130,7 @@ class WordStatus(CreatedUpdateBaseModel):
     class Meta:
         verbose_name = 'Статус изучения слова'
         ordering = ('id',)
+        unique_together = ('user', 'word')
 
     def __str__(self):
         return f'{self.user.username}: {self.word.text}'
@@ -175,15 +177,15 @@ class WordStatus(CreatedUpdateBaseModel):
 
 class LearningStatus(CreatedUpdateBaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    repeat_words = models.ManyToManyField(WordStatus)
+    repeat_words = models.ManyToManyField(WordStatus, blank=True, null=True)
     count_words = models.IntegerField(
         default=5, verbose_name='Количество слов, которые пользователь будет учить за раз')
     repetition_word_status = models.ForeignKey(
-        WordStatus, on_delete=models.SET_NULL, null=True, related_name='from_repetition',
+        WordStatus, on_delete=models.SET_NULL, blank=True, null=True, related_name='from_repetition',
         verbose_name='На этом слове остановились повторять',
     )
     learn_word = models.ForeignKey(
-        Word, on_delete=models.SET_NULL, null=True,
+        Word, on_delete=models.SET_NULL, blank=True, null=True,
         verbose_name='На этом слове остановились изучать',
     )
 
@@ -205,9 +207,6 @@ class LearningStatus(CreatedUpdateBaseModel):
         self.repetition_word_status_id = word_status_id
         self.save(update_fields=('repetition_word_status_id',))
 
-    def reset_repetition_word_status(self):
-        self.set_repetition_word_status_id(None)
-
     @property
     def next_learn_word(self) -> typing.Optional[Word]:
         from_word_id = self.learn_word_id or 0
@@ -224,11 +223,14 @@ class LearningStatus(CreatedUpdateBaseModel):
         """
         Возвращает следующее слово для повторения
         если больше нет слов для повторения => возвращает None
+            (все слова были повторены или их не начинали повторять)
         """
         repetition_word_status_id = 0
         if self.repetition_word_status_id and not start_repetition:
             repetition_word_status_id = self.repetition_word_status_id
 
+        # мы не фильтруем sql-ем т.k. это лишний запрос, а repeat_words.all() его не делает,
+        # если до этого был prefetch
         next_repeat_words = filter(
             lambda x: x.id > repetition_word_status_id, self.repeat_words.all(),
         )
@@ -248,6 +250,22 @@ class LearningStatus(CreatedUpdateBaseModel):
         self.learn_word = word
         self.save(update_fields=('learn_word_id',))
 
+    @property
+    def is_words_were_repeated(self):
+        return self.get_next_repeat_word_status() is None and self.learn_word_id
+
+    def clear_repeated_words(self):
+        """
+        Очищаем список слов для повторения
+
+        Всем повторенным словам устанавливаем следующее время для повторения
+        Очищаем все слова для повторения
+        Устанавливаем следующее слово для повторения в None
+        """
+        self.update_repetition_time_for_repeated_words()
+        self.repeat_words.clear()
+        self.set_repetition_word_status_id(None)
+
     def update_notification_time(self, set_time=None):
         logger.debug(
             'LearningStatus for user=%d update notification_time: %s',
@@ -256,26 +274,50 @@ class LearningStatus(CreatedUpdateBaseModel):
         self.repetition_notified = set_time
         self.save(update_fields=('repetition_notified',))
 
-    def reset_repeated_words(self):
-        self.repeat_words.clear()
-        self.reset_repetition_word_status()
-
     @atomic()
-    def update_repetition_time_for_repeated_words(self, with_last_repeated=False):
+    def update_repetition_time_for_repeated_words(self):
         next_repeat_word_status = self.get_next_repeat_word_status()
-        # если нету следующего слова для повторения -> все слова были повторены
-        # значит устанавливаем float(inf) - бесконечно большое число
-        last_repeat_id = next_repeat_word_status and next_repeat_word_status.id or float('Inf')
+
+        if next_repeat_word_status:
+            next_repeat_id = next_repeat_word_status.id
+        elif self.is_words_were_repeated:
+            next_repeat_id = float('Inf')
+        else:
+            next_repeat_id = 0  # не обязательно, сюда не должны попадать
 
         def check_words_was_repeated(w: WordStatus):
             """
             Проверка, что слово было повторено
+            id слова, которое нужно повторять больше id, повторенного слова
+            """
+            return next_repeat_id > w.id
+
+        # делаем ручную фильтрацию вместо sql, т.k. до этого был выполнен prefetch_related,
+        # который вытащил все repeat_words
+        repeat_words = filter(check_words_was_repeated, self.repeat_words.all())
+        now = get_datetime_now()
+        for word_status in repeat_words:
+            word_status.set_next_repetition_time(now)
+
+    @atomic()
+    def update_repeated_words(self, with_last_repeated=False):
+        next_repeat_word_status = self.get_next_repeat_word_status()
+        # если нету следующего слова для повторения -> все слова были повторены
+        # значит устанавливаем float(inf) - бесконечно большое число
+        next_repeat_id = next_repeat_word_status and next_repeat_word_status.id or float('Inf')
+
+        def check_words_were_repeated(w: WordStatus):
+            """
+            Проверка, что слово было повторено
+            id слова, которое нужно повторять больше id, повторенного слова
             """
             # if with_last_repeated and self.repetition_word_status_id:
             #     return w.id <= last_repeat_id
-            return w.id < last_repeat_id
+            return next_repeat_id > w.id
 
-        repeat_words = filter(check_words_was_repeated, self.repeat_words.all())
+        # делаем ручную фильтрацию вместо sql, т.k. до этого был выполнен prefetch_related,
+        # который вытащил все repeat_words
+        repeat_words = filter(check_words_were_repeated, self.repeat_words.all())
         now = get_datetime_now()
         for word_status in repeat_words:
             word_status.set_next_repetition_time(now)
