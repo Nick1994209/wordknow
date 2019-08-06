@@ -70,9 +70,6 @@ class User(CreatedUpdateBaseModel):
     @atomic
     def update_status(self, new_status):
         logger.debug('User=%s update status from %s - %s', self.id, self.status, new_status)
-        if new_status == self.status:
-            return
-
         self.perform_last_status_actions(old_status=self.status, new_status=new_status)
         self.status = new_status
         self.save(update_fields=('status',))
@@ -112,7 +109,7 @@ class Word(CreatedUpdateBaseModel):
                              null=True, verbose_name='Cлово пользователя')
 
     def __str__(self):
-        return f'{self.text} - {self.translate}'
+        return f'{self.text} - {self.translate}: user={self.user and self.user.username}'
 
     @property
     def learn_text(self):
@@ -133,7 +130,7 @@ class WordStatus(CreatedUpdateBaseModel):
         unique_together = ('user', 'word')
 
     def __str__(self):
-        return f'{self.user.username}: {self.word.text}'
+        return f'WordStatus="{self.word}"'
 
     def increase_not_guess(self):
         self.number_not_guess += 1
