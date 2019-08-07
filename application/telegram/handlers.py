@@ -113,7 +113,8 @@ def query_text(query):
     text = ''
     if last_word:
         text = last_word.learn_text
-    logger.warning("DON'T HAVE GENERAL WORDS")
+    else:
+        logger.warning("DON'T HAVE GENERAL WORDS")
 
     start_text = "{} I'm learning words! And you? {}".format(
         settings.TELEGRAM_BOT_NAME, constants.Emogies.wink

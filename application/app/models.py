@@ -109,7 +109,7 @@ class Word(CreatedUpdateBaseModel):
                              null=True, verbose_name='Cлово пользователя')
 
     def __str__(self):
-        return f'{self.text} - {self.translate}: user={self.user and self.user.username}'
+        return f'{self.text} - {self.translate}'
 
     @property
     def learn_text(self):
@@ -120,7 +120,7 @@ class WordStatus(CreatedUpdateBaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='learned_words')
     word = models.ForeignKey(Word, on_delete=models.CASCADE, related_name='learned_words')
     start_repetition_time = models.DateTimeField(
-        null=True, verbose_name='Время когда нужно будет повторить слово')
+        null=True, blank=True, verbose_name='Время когда нужно будет повторить слово')
     count_repetitions = models.IntegerField(default=0, verbose_name='Количество повторений слова')
     number_not_guess = models.IntegerField(default=0, verbose_name='Сколько раз не угадал слово')
 
@@ -130,7 +130,7 @@ class WordStatus(CreatedUpdateBaseModel):
         unique_together = ('user', 'word')
 
     def __str__(self):
-        return f'WordStatus="{self.word}"'
+        return f'WordStatus "{self.word}", user={self.user}'
 
     def increase_not_guess(self):
         self.number_not_guess += 1
@@ -188,7 +188,7 @@ class LearningStatus(CreatedUpdateBaseModel):
 
     repetition_notified = models.DateTimeField(
         null=True, verbose_name='Когда оповещали о повторении слов',
-    )
+    )  # TODO rename to repetition_notified_time
 
     class Meta:
         verbose_name = 'Статус пользователя повторения/изучения слов'
@@ -263,41 +263,37 @@ class LearningStatus(CreatedUpdateBaseModel):
         self.repeat_words.clear()
         self.set_repetition_word_status_id(None)
 
-    def update_notification_time(self, set_time=None):
+    def update_notification_time(self, time=None):
+        """
+
+        :param set_time:
+        :return:
+        """
         logger.debug(
             'LearningStatus for user=%d update notification_time: %s',
-            self.user_id, set_time,
+            self.user_id, time,
         )
-        self.repetition_notified = set_time
+        self.repetition_notified = time
         self.save(update_fields=('repetition_notified',))
 
     @atomic()
     def update_repetition_time_for_repeated_words(self):
-        next_repeat_word_status = self.get_next_repeat_word_status()
-
-        if next_repeat_word_status:
-            next_repeat_id = next_repeat_word_status.id
-        elif self.is_words_were_repeated:
+        if self.is_words_were_repeated:
             next_repeat_id = float('Inf')
+        if self.repetition_word_status_id:
+            next_repeat_id = self.repetition_word_status_id
         else:
-            next_repeat_id = 0  # не обязательно, сюда не должны попадать
-
-        def check_words_was_repeated(w: WordStatus):
-            """
-            Проверка, что слово было повторено
-            id слова, которое нужно повторять больше id, повторенного слова
-            """
-            return next_repeat_id > w.id
+            next_repeat_id = 0
 
         # делаем ручную фильтрацию вместо sql, т.k. до этого был выполнен prefetch_related,
         # который вытащил все repeat_words
-        repeat_words = filter(check_words_was_repeated, self.repeat_words.all())
+        repeat_words = filter(lambda w: w.id < next_repeat_id, self.repeat_words.all())
         now = get_datetime_now()
         for word_status in repeat_words:
             word_status.set_next_repetition_time(now)
 
     @atomic()
-    def update_repeated_words(self, with_last_repeated=False):
+    def update_repeated_words(self):
         next_repeat_word_status = self.get_next_repeat_word_status()
         # если нету следующего слова для повторения -> все слова были повторены
         # значит устанавливаем float(inf) - бесконечно большое число
@@ -308,8 +304,6 @@ class LearningStatus(CreatedUpdateBaseModel):
             Проверка, что слово было повторено
             id слова, которое нужно повторять больше id, повторенного слова
             """
-            # if with_last_repeated and self.repetition_word_status_id:
-            #     return w.id <= last_repeat_id
             return next_repeat_id > w.id
 
         # делаем ручную фильтрацию вместо sql, т.k. до этого был выполнен prefetch_related,

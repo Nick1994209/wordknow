@@ -24,10 +24,11 @@ def safe_send_message(user: User, text: str, markup=None) -> bool:
         bot.send_message(user.chat_id, text, reply_markup=markup)
         return True
     except telebot.apihelper.ApiException as e:
-        logger.info('User=%s cant send message: api_exception=%s', user.username, e)
+        logger.info('User=%s cant send message: api_exception=%s, msg=%s', user.username, e, text)
         return False
     except Exception as e:
-        logger.exception('User=%s cant send message: base exception=%s', user.username, e)
+        logger.exception('User=%s cant send message: base exception=%sm msg=%s',
+                         user.username, e, text)
         return False
 
 
