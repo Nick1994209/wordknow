@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 
 
 def main():
-    env_file = 'environments.env'
+    env_file = '.env'
     proxy = get_https_proxy()
 
     with open(env_file, 'a') as f:

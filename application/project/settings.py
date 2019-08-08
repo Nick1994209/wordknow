@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # environments in main directory
-env_file_path = os.path.join(BASE_DIR, '../environments.env')
+env_file_path = os.path.join(BASE_DIR, '../.env')
 if os.path.exists(env_file_path):
     load_dotenv(dotenv_path=env_file_path, verbose=True)
 

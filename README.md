@@ -31,7 +31,7 @@ http://wordknow.ml
 
     docker-compose up
  
-###### Add environments.env with secrets
+###### Add .env with secrets
     
     TELEGRAM_BOT_KEY='****-***'
     TELEGRAM_BOT_NAME='@your_bot_name'

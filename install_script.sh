@@ -46,7 +46,7 @@ cd ..
 
 echo "SETUP GUNICORN"
 
-# add /code/wordknow/environments.env
+# add /code/wordknow/.env
 
 cp etc/gunicorn.service /etc/systemd/system/gunicorn.service
 systemctl start gunicorn
