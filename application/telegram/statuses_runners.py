@@ -2,6 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 
 import telebot
+from django.conf import settings
 from django.db.transaction import atomic
 
 from app.models import User, WordStatus
@@ -59,6 +60,10 @@ class LearnWordRunner(BaseRunner):
                 '%s Вы изучили все слова! Можно добавить еще слова для изучения! %s %s ' % (
                     get_success_text(), constants.Emogies.fearful, constants.Emogies.astonished,
                 ),
+            )
+            send_message(
+                self.user,
+                f'Вы можете добавить слова на сайте {settings.BOT_SITE_URL}'
             )
             self.user.update_status(User.Status.FREE)
             send_message(

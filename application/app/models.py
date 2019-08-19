@@ -280,7 +280,7 @@ class LearningStatus(CreatedUpdateBaseModel):
     def update_repetition_time_for_repeated_words(self):
         if self.is_words_were_repeated:
             next_repeat_id = float('Inf')
-        if self.repetition_word_status_id:
+        elif self.repetition_word_status_id:
             next_repeat_id = self.repetition_word_status_id
         else:
             next_repeat_id = 0

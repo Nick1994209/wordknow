@@ -28,6 +28,7 @@ fi
 
 set -o errexit
 set -o nounset
+set -o pipefail
 set -o xtrace
 
 test -e ~/.ssh/id_rsa.pub
