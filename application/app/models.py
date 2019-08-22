@@ -107,9 +107,14 @@ class Word(CreatedUpdateBaseModel):
     translate = models.CharField(max_length=256)
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              null=True, verbose_name='Cлово пользователя')
+    phrase = models.CharField(max_length=256, verbose_name='Текст для лучшего запоминания',
+                              blank=True)
 
     def __str__(self):
-        return f'{self.text} - {self.translate}'
+        _word = f'{self.text} - {self.translate}'
+        if not self.phrase:
+            return _word
+        return f'{_word}\n{self.phrase}'
 
     @property
     def learn_text(self):

@@ -2,53 +2,28 @@ version: "3.6"
 
 services:
 
-  server:
+  telegram: &base_app
     build: .
-    ports:
-    - "9900:8000"
-    links:
-    - pg
     volumes:
     - ./:/code/
-    command: python manage.py runserver 0.0.0.0:8000
-    environment:
-    - DB_NAME=wordknow
-    - DB_USER=user
-    - DB_PASSWORD=pass
-    - DB_HOST=pg
-
     depends_on:
     - pg
-
-  telegram:
-    build: .
-    links:
-    - pg
-    volumes:
-    - ./:/code/
     environment:
     - DB_NAME=wordknow
     - DB_USER=user
     - DB_PASSWORD=pass
     - DB_HOST=pg
     command: python manage.py telegram
-    depends_on:
-    - pg
 
   telegram_tasks:
-    build: .
-    links:
-    - pg
-    volumes:
-    - ./:/code/
-    environment:
-    - DB_NAME=wordknow
-    - DB_USER=user
-    - DB_PASSWORD=pass
-    - DB_HOST=pg
+    <<: *base_app
     command: python manage.py telegram_tasks
-    depends_on:
-    - pg
+
+  server:
+    <<: *base_app
+    ports:
+    - "9900:8000"
+    command: python manage.py runserver 0.0.0.0:8000
 
   pg:
     image: postgres
@@ -58,3 +33,4 @@ services:
     - POSTGRES_DB=wordknow
     volumes:
     - ./.pg:/var/lib/postgresql/data/
+#    - database:/var/lib/postgresql/data # it's used for increasing speed app

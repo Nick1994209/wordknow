@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 
 from app.models import User
@@ -35,22 +37,28 @@ class WordsForm(forms.Form):
 
     def get_without_trash_words(self):
         lines = [
-            f'{text}{self._splitter}{translate}'
-            for text, translate in self.get_translates()
+            f'{text}{self._splitter}{translate}{self._splitter}{phrase}'
+            for text, translate, phrase in self.get_translates()
         ]
         return '\n'.join(lines)
 
     def get_translates(self):
         translates = []
         for line in self.cleaned_data['words'].splitlines():
-            split_line = line.strip().split(self._splitter)
+            line = line.strip()
+            line = re.sub(f'{self._splitter}+', self._splitter, line)
+            split_line = line.split(self._splitter)
             split_line = list(filter(bool, split_line))
 
-            if len(split_line) != 2:
+            if len(split_line) == 3:
+                text, translate, phrase = split_line
+            elif len(split_line) == 2:
+                text, translate = split_line
+                phrase = ''
+            else:
                 continue
 
-            text, translate = split_line
-            translates.append((text.strip(), translate.strip()))
+            translates.append((text.strip(), translate.strip(), phrase.strip()))
 
         return translates
 

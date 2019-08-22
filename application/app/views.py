@@ -93,6 +93,6 @@ class CreateWordsView(AuthenticationMixin, TemplateFormMixin, FormView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def save_words(self, form: forms.WordsForm):
-        words = [Word(text=text, translate=translate, user=self._user)
-                 for text, translate in form.get_translates()]
+        words = [Word(text=text, translate=translate, phrase=phrase, user=self._user)
+                 for text, translate, phrase in form.get_translates()]
         Word.objects.bulk_create(words, batch_size=500)
