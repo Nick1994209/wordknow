@@ -112,7 +112,7 @@ def query_text(query):
 
     text = ''
     if last_word:
-        text = last_word.learn_text
+        text = last_word.learning_text
     else:
         logger.warning("DON'T HAVE GENERAL WORDS")
 

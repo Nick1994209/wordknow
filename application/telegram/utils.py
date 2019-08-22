@@ -32,8 +32,8 @@ def safe_send_message(user: User, text: str, markup=None, parse_mode=None) -> bo
         return False
 
 
-def send_message(user: User, text: str, markup=None, parse_mode='markdown'):
-    if not safe_send_message(user, text, markup, parse_mode):
+def send_message(user: User, text: str, markup=None, parse_mode=None):
+    if not safe_send_message(user, text, markup=markup, parse_mode=parse_mode):
         raise SendMessageException()
 
 

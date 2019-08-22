@@ -75,10 +75,12 @@ class LearnWordRunner(BaseRunner):
             return
 
         send_message(
-            self.user, f'{word.learn_text}\n*{word.phrase}*',
+            self.user,
+            word.learning_text_markdown,
             markup=generate_markup(
                 constants.Commands.learn, constants.Commands.miss, constants.Handlers.stop.path,
             ),
+            parse_mode='markdown',
         )
 
     def set_learn_word(self, message_text: str) -> bool:
@@ -148,7 +150,7 @@ class RepeatWord(BaseRunner):
             return
 
         if start_repetition:
-            send_message(self.user, 'Повторять слова это здоворо! Приступим! Введите перевод:')
+            send_message(self.user, 'Повторять слова это здоворо! *Приступим*! Введите перевод:')
 
         learning_status.set_repetition_word_status_id(next_word_status.id)
         send_message(self.user, next_word_status.get_word_for_translating())
@@ -164,11 +166,13 @@ class RepeatWord(BaseRunner):
             return True
 
         repetition_word_status.increase_not_guess()
-        text = (f'{repetition_word_status.word.learn_text}\n'
-                f'*{repetition_word_status.word.phrase}*\n'
-                f' Пожалуйста, напишите translate слова: '
-                f'"{repetition_word_status.get_word_for_translating()}"\n'
-                f' Вы можете удалить это слово: {constants.Handlers.delete_word.path}')
-
-        send_message(self.user, text)
+        text = (
+            f'{repetition_word_status.word.learning_text_markdown}\n'
+            f' Пожалуйста, напишите translate слова: '
+            f'"`{repetition_word_status.get_word_for_translating()}`"\n'
+        )
+        send_message(self.user, text, parse_mode='markdown')
+        send_message(
+            self.user, f' Вы можете удалить это слово: {constants.Handlers.delete_word.path}',
+        )
         return False

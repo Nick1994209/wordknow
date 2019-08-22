@@ -114,8 +114,17 @@ class Word(CreatedUpdateBaseModel):
         return f'{self.text} - {self.translate}'
 
     @property
-    def learn_text(self):
+    def learning_text(self):
         return f'{self.text} - {self.translate}'
+
+    @property
+    def learning_text_markdown(self):
+        # .replace('*', ' ') - при подстановки текста в markdown лишние * могут выдать ошибку
+        text = self.learning_text.replace('*', ' ').replace('_', ' ')
+        text = f'*{text}*'  # set bold text
+        if not self.phrase:
+            return text
+        return text + f'\n_* {self.phrase} *_'  # set italic phrase
 
 
 class WordStatus(CreatedUpdateBaseModel):
