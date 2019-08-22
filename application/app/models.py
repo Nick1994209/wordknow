@@ -111,10 +111,7 @@ class Word(CreatedUpdateBaseModel):
                               blank=True)
 
     def __str__(self):
-        _word = f'{self.text} - {self.translate}'
-        if not self.phrase:
-            return _word
-        return f'{_word}\n{self.phrase}'
+        return f'{self.text} - {self.translate}'
 
     @property
     def learn_text(self):

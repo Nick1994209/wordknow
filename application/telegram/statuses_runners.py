@@ -75,7 +75,7 @@ class LearnWordRunner(BaseRunner):
             return
 
         send_message(
-            self.user, word.learn_text,
+            self.user, f'{word.learn_text}\n*{word.phrase}*',
             markup=generate_markup(
                 constants.Commands.learn, constants.Commands.miss, constants.Handlers.stop.path,
             ),
@@ -164,14 +164,11 @@ class RepeatWord(BaseRunner):
             return True
 
         repetition_word_status.increase_not_guess()
-        text = ('%s\n'
-                ' Пожалуйста, напишите translate слова: "%s"\n'
-                ' Вы можете удалить это слово: %s')
-        text = text % (
-            repetition_word_status.word,
-            repetition_word_status.get_word_for_translating(),
-            constants.Handlers.delete_word.path,
-        )
+        text = (f'{repetition_word_status.word.learn_text}\n'
+                f'*{repetition_word_status.word.phrase}*\n'
+                f' Пожалуйста, напишите translate слова: '
+                f'"{repetition_word_status.get_word_for_translating()}"\n'
+                f' Вы можете удалить это слово: {constants.Handlers.delete_word.path}')
 
         send_message(self.user, text)
         return False
