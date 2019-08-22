@@ -15,13 +15,13 @@ logger = logging.getLogger(__name__)
 
 
 @retry_if_false(attempts_count=5, sleep_time=0.1, use_logging=True)
-def safe_send_message(user: User, text: str, markup=None) -> bool:
+def safe_send_message(user: User, text: str, markup=None, parse_mode=None) -> bool:
     if settings.TELEGRAM_DEBUG:
         logger.info('User=%d SEND MESSAGE=%s', user.id, safe_str(text))
         return True
 
     try:
-        bot.send_message(user.chat_id, text, reply_markup=markup)
+        bot.send_message(user.chat_id, text, reply_markup=markup, parse_mode=parse_mode)
         return True
     except telebot.apihelper.ApiException as e:
         logger.info('User=%s cant send message: api_exception=%s, msg=%s', user.username, e, text)
@@ -32,8 +32,8 @@ def safe_send_message(user: User, text: str, markup=None) -> bool:
         return False
 
 
-def send_message(user: User, text: str, markup=None):
-    if not safe_send_message(user, text, markup):
+def send_message(user: User, text: str, markup=None, parse_mode='markdown'):
+    if not safe_send_message(user, text, markup, parse_mode):
         raise SendMessageException()
 
 
