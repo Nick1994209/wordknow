@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def main():
+def set_new_proxy():
     env_file = '.env'
     proxy = get_https_proxy()
 
@@ -29,7 +29,11 @@ def get_https_proxy(body_proxy=None):
 
         print(https_proxy)
         try:
-            r = requests.get('https://api.telegram.org/api/', proxies={'https': https_proxy}, timeout=2)
+            r = requests.get(
+                'https://api.telegram.org/api/',
+                proxies={'https': https_proxy},
+                timeout=2,
+            )
             print(r.status_code)
             if r.status_code != 200:
                 continue
@@ -41,4 +45,4 @@ def get_https_proxy(body_proxy=None):
 
 
 if __name__ == '__main__':
-    main()
+    set_new_proxy()

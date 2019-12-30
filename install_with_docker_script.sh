@@ -41,9 +41,9 @@ cd /code
 
 git clone git@github.com:Nick1994209/wordknow.git
 
-cd wordknow
+cd /code/wordknow
 docker-compose run server python manage.py migrate
-# if required
+# if required creating superuser
 #docker-compose run server python manage.py shell -c \
 # "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'pass')"
 
@@ -51,7 +51,7 @@ apt-get install nginx -y
 echo "SETUP NGINX"
 
 rm /etc/nginx/nginx.conf
-cp eetc/nginx.wordknow.docker-compose /etc/nginx/nginx.conf
+cp /code/wordknow/etc/nginx.wordknow.docker-compose /etc/nginx/nginx.conf
 nginx -t  # check nginx config is ok
 systemctl restart nginx
 # for nginx logs  $ tail -F /var/log/nginx/error.log
@@ -59,8 +59,7 @@ systemctl restart nginx
 ufw allow 'Nginx Full'
 ufw status
 
-nohup docker-compose up &
-
+cd /code/wordknow/
 SERVER_IP="$(ip route get 1 | awk '{print $7}')"
 echo "
 TELEGRAM_BOT_KEY="$TELEGRAM_TOKEN"
@@ -69,5 +68,7 @@ BOT_SITE_URL="http://$SERVER_IP"
 
 # you can add proxy
 # http_proxy=host:port
-# https_proxy=host:porthttps_proxy=Nono
+# https_proxy=host:port
 " >> ./.env
+
+nohup docker-compose up &
