@@ -150,10 +150,12 @@ class RepeatWord(BaseRunner):
             return
 
         if start_repetition:
-            send_message(self.user, 'Повторять слова это здоворо! *Приступим*! Введите перевод:')
+            send_message(self.user, 'Повторять слова это здоворо! *Приступим*! Введите перевод:',
+                         parse_mode='markdown')
 
         learning_status.set_repetition_word_status_id(next_word_status.id)
-        send_message(self.user, next_word_status.get_word_for_translating())
+        word_for_translating = next_word_status.get_word_for_translating()
+        send_message(self.user, f'> {word_for_translating}')
 
     def guess(self) -> bool:
         guess_translated = self.message.text

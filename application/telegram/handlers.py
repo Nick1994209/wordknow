@@ -71,8 +71,11 @@ def delete_word_handler(message: telebot.types.Message):
 
     word_status = user.learning_status.repetition_word_status
     if word_status:
+        user.update_status(User.Status.FREE)
+
         send_message(user, '  Прощай "%s".' % word_status.word)
         word_status.delete()
+        logger.info(f'word_status=%s was deleted', word_status)
 
     RepeatWord(message=message, user=user).first_run()
 

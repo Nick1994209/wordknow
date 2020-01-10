@@ -1,7 +1,5 @@
 from PIL import Image
 
-# in BotFather for set icon /setuserpic
-
 path = ''
 resize_img_path = ''
 

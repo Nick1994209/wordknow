@@ -275,11 +275,6 @@ class LearningStatus(CreatedUpdateBaseModel):
         self.set_repetition_word_status_id(None)
 
     def update_notification_time(self, time=None):
-        """
-
-        :param set_time:
-        :return:
-        """
         logger.debug(
             'LearningStatus for user=%d update notification_time: %s',
             self.user_id, time,
