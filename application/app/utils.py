@@ -3,10 +3,9 @@ from functools import wraps
 from time import sleep
 
 import pytz
+from django.conf import settings
 from django.core.management import BaseCommand
-from django.utils import timezone, autoreload
-
-from project import settings
+from django.utils import autoreload, timezone
 
 log = logging.getLogger(__name__)
 

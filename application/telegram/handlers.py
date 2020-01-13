@@ -2,10 +2,10 @@ import logging
 import time
 
 import telebot
+from django.conf import settings
 from django.db.transaction import atomic
 
 from app.models import User, Word
-from project import settings
 from telegram.utils import send_message
 
 from . import constants
@@ -41,9 +41,9 @@ def start_handler(message: telebot.types.Message):
         message_resp += '\n Сейчас Вы находитесь в стадии заучивания новых слов :)'
     elif user.status == User.Status.REPETITION:
         message_resp += '\n Сейчас Вы находитесь в стадии повторения слов :)'
-    else:
-        message_resp += ('\n Вы можете добавить слова которые хотите изучить на сайте %s'
-                         % settings.BOT_SITE_URL)
+
+    message_resp += ('\n Вы можете добавить слова которые хотите изучать '
+                     f'на сайте {settings.BOT_SITE_URL}')
     send_message(user, message_resp, markup=get_learn_repeat_markup())
 
 

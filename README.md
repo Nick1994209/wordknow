@@ -55,3 +55,18 @@ http://wordknow.ml
 ###### pillow requiremenents
 
     brew install libjpeg
+
+###### for local running
+
+```shell script
+docker run -p 127.0.0.1:5432:5432 \
+    --name wordknow \
+    -e POSTGRES_DATABASE=wordknow_db \ 
+    -e POSTGRES_USERNAME=wordknow \ 
+    -e POSTGRES_PASSWORD=1234 \ 
+    --network=contactpay-net --network-alias=database \
+    --mount source=postgres-data,destination=/var/lib/postgresql/data \
+    -d postgres:11 \
+    -c log_statement=all \
+    -c log_min_duration_statement=0
+```

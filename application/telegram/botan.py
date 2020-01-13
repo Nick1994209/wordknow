@@ -4,9 +4,9 @@
 import logging
 
 import requests
+from django.conf import settings
 
 from app.utils import retry_if_false, safe_str
-from project import settings
 
 TRACK_URL = 'https://api.botan.io/track'
 

@@ -1,5 +1,4 @@
 import telebot
-
-from project import settings
+from django.conf import settings
 
 bot = telebot.TeleBot(settings.TELEGRAM_BOT_KEY, threaded=False)

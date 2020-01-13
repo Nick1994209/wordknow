@@ -155,7 +155,15 @@ class RepeatWord(BaseRunner):
 
         learning_status.set_repetition_word_status_id(next_word_status.id)
         word_for_translating = next_word_status.get_word_for_translating()
-        send_message(self.user, f'> {word_for_translating}')
+        send_message(
+            self.user,
+            f'> {word_for_translating}',
+            generate_markup(
+                constants.Handlers.delete_word.path,
+                constants.Handlers.stop.path,
+                constants.Handlers.help.path,
+            ),
+        )
 
     def guess(self) -> bool:
         guess_translated = self.message.text
