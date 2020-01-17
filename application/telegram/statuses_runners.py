@@ -74,14 +74,23 @@ class LearnWordRunner(BaseRunner):
             )
             return
 
+        commands = (constants.Commands.learn, constants.Commands.miss, constants.Handlers.stop.path)
         send_message(
             self.user,
             word.learning_text_markdown,
-            markup=generate_markup(
-                constants.Commands.learn, constants.Commands.miss, constants.Handlers.stop.path,
-            ),
+            markup=generate_markup(*commands),
             parse_mode='markdown',
         )
+
+        sound_data = word.get_word_sound()
+        if sound_data:
+            url, text = sound_data
+            send_message(
+                self.user,
+                f'<a href="{url}"><i>{text}</i></a>',
+                markup=generate_markup(*commands),
+                parse_mode='html',
+            )
 
     def set_learn_word(self, message_text: str) -> bool:
         word = self.user.learning_status.next_learn_word

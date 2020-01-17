@@ -45,7 +45,11 @@ def generate_markup(*items):
 
 
 def get_learn_repeat_markup():
-    return generate_markup(constants.Handlers.learn_words.path, constants.Handlers.repetition.path)
+    return generate_markup(
+        constants.Handlers.learn_words.path,
+        constants.Handlers.repetition.path,
+        constants.Handlers.help.path,
+    )
 
 
 def get_user(message: telebot.types.Message):
@@ -69,6 +73,7 @@ def get_success_text() -> str:
         'Краусава!', 'Где же вы были раньше?)', 'Не переродились еще на Руси!',
     ]
     return random_choice(texts)
+
 
 # class TelegramHandler:
 #     def __init__(self, message):

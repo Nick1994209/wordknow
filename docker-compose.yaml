@@ -14,6 +14,8 @@ services:
     - DB_PASSWORD=pass
     - DB_HOST=pg
     command: python manage.py telegram
+    networks:
+      - wordknow-net
 
   telegram_tasks:
     <<: *base_app
@@ -33,4 +35,9 @@ services:
     - POSTGRES_DB=wordknow
     volumes:
     - ./.pg:/var/lib/postgresql/data/
-#    - database:/var/lib/postgresql/data # it's used for increasing speed app
+#    - wordknow-database:/var/lib/postgresql/data # it's used for increasing speed app
+
+networks:
+  wordknow-net:
+    name: wordknow-net
+    driver: bridge

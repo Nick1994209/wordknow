@@ -32,7 +32,7 @@ def get_https_proxy(body_proxy=None):
             r = requests.get(
                 'https://api.telegram.org/api/',
                 proxies={'https': https_proxy},
-                timeout=2,
+                timeout=0.5,
             )
             print(r.status_code)
             if r.status_code != 200:

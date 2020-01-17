@@ -3,12 +3,15 @@ import random
 import typing
 import uuid
 
+import enchant
 from django.conf import settings
 from django.db import models
 from django.db.transaction import atomic
 from django.utils.functional import cached_property
 
 from app.utils import get_datetime_now, safe_str
+from clients.base import ClientException
+from clients.skyeng import SkyengClient, schemas as skyeng_schemas
 
 logger = logging.getLogger(__name__)
 
@@ -125,6 +128,28 @@ class Word(CreatedUpdateBaseModel):
         if not self.phrase:
             return text
         return text + f'\n_* {self.phrase} *_'  # set italic phrase
+
+    def get_word_sound(self) -> typing.Optional[typing.Tuple[str, str]]:
+        # now it's worked only with eng words
+
+        eng_checker = enchant.Dict("en_US")
+        eng_word = None
+        if eng_checker.check(self.text):
+            eng_word = self.text
+        elif eng_checker.check(self.translate):
+            eng_word = self.translate
+        if not eng_word:
+            return None
+
+        eng_word: typing.cast(str, eng_word)
+        try:
+            eng_word_list = SkyengClient().search_word_meaning(eng_word)
+        except ClientException:
+            return None
+        word = eng_word_list.get_first_word_with_sound()
+        if word:
+            return word.text, word.get_sound_url()
+        return None
 
 
 class WordStatus(CreatedUpdateBaseModel):
