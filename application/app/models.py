@@ -11,7 +11,8 @@ from django.utils.functional import cached_property
 
 from app.utils import get_datetime_now, safe_str
 from clients.base import ClientException
-from clients.skyeng import SkyengClient, schemas as skyeng_schemas
+from clients.skyeng import SkyengClient
+from clients.skyeng import schemas as skyeng_schemas
 
 logger = logging.getLogger(__name__)
 

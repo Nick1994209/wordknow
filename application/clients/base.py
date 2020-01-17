@@ -1,7 +1,7 @@
 import logging
 from http import HTTPStatus
 from json import JSONDecodeError
-from typing import Optional, Tuple, Union, TypeVar, TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Optional, Tuple, Type, TypeVar, Union
 from urllib.parse import urljoin
 
 import pydantic

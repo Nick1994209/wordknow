@@ -1,5 +1,5 @@
-from application.clients import base
-from application.clients.skyeng import schemas
+from clients import base
+from clients.skyeng import schemas
 
 
 class SkyengClient(base.JSONClient):
