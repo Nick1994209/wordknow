@@ -7,7 +7,8 @@ RUN apk update && apk add --no-cache \
     musl-dev \
     postgresql-dev \
     postgresql-libs \
-    zlib-dev
+    zlib-dev \
+    enchant
 
 ADD ./requirements.txt ./requirements.txt
 RUN pip3 install --upgrade pip && pip3 install -r ./requirements.txt
