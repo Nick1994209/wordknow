@@ -131,13 +131,10 @@ class Word(CreatedUpdateBaseModel):
         return text + f'\n_* {self.phrase} *_'  # set italic phrase
 
     def get_word_sound(self) -> typing.Optional[typing.Tuple[str, str]]:
-        # now it's worked only with eng words
-
-        eng_checker = enchant.Dict("en_US")
         eng_word = None
-        if eng_checker.check(self.text):
+        if settings.LANG_DICT['en'].check(self.text):
             eng_word = self.text
-        elif eng_checker.check(self.translate):
+        elif settings.LANG_DICT['en'].check(self.translate):
             eng_word = self.translate
         if not eng_word:
             return None
