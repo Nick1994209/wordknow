@@ -84,7 +84,7 @@ class LearnWordRunner(BaseRunner):
 
         sound_data = word.get_word_sound()
         if sound_data:
-            url, text = sound_data
+            text, url = sound_data
             send_message(
                 self.user,
                 f'<a href="{url}"><i>{text}</i></a>',
