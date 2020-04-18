@@ -128,7 +128,8 @@ class Word(CreatedUpdateBaseModel):
         text = f'*{text}*'  # set bold text
         if not self.phrase:
             return text
-        return text + f'\n_* {self.phrase} *_'  # set italic phrase
+        phrase = self.phrase.replace('*', ' ').replace('_', ' ')
+        return text + f'\n_* {phrase} *_'  # set italic phrase
 
     def get_word_sound(self) -> typing.Optional[typing.Tuple[str, str]]:
         eng_word = None
