@@ -193,7 +193,6 @@ COUNT_TRIES_CONNECT = 100
 SLEEP_TIME = 1
 
 # -------- telegram ----------
-BOTAN_API_KEY = os.environ.get('BOTAN_API_KEY', '')
 TELEGRAM_BOT_KEY = os.environ.get('TELEGRAM_BOT_KEY', '')
 TELEGRAM_BOT_NAME = os.environ.get('TELEGRAM_BOT_NAME', '')
 TELEGRAM_DEBUG = os.environ.get('TELEGRAM_DEBUG', 'false').lower() == 'true'

@@ -52,16 +52,17 @@ def get_learn_repeat_markup():
     )
 
 
-def get_user(message: telebot.types.Message):
-    try:
-        user, _ = User.objects.get_or_create(
-            chat_id=message.chat.id, username=message.from_user.username,
-        )
-    except User.DoesNotFound as e:
+def get_user(message: telebot.types.Message) -> User:
+    user, is_created = User.objects.get_or_create(
+        chat_id=message.chat.id,
+        defaults=dict(
+            username=message.from_user.username,
+        ),
+    )
+    if is_created:
+        logger.info('Added new user chat_id=%s, username=%s', user.chat_id, user.username)
 
-        logger.exception(e)
-        # типо пользователь уже существует, но с другим именем. зато chat_id неизменился
-        user = User.objects.get(chat_id=message.chat.id)
+    if user.username != message.from_user.username:
         user.username = message.from_user.username
         user.save(update_fields=('username',))
     return user
@@ -75,48 +76,11 @@ def get_success_text() -> str:
     return random_choice(texts)
 
 
-# class TelegramHandler:
-#     def __init__(self, message):
-#         self.message = message
-#
-#     def handle(self, message: telebot.types.Message):
-#         raise NotImplemented
-#
-#     @classmethod
-#     def set_handler(cls, bot: telebot.TeleBot, command):
-#         message_handler = cls.get_handler()
-#
-#         commands = command if isinstance(command, (list, tuple)) else [command]
-#         bot.message_handler(commands=commands)(message_handler)
-#
-#     @classmethod
-#     def get_handler(cls):
-#         @wraps(cls)
-#         def handle(message: telebot.types.Message):
-#             self = cls(message)
-#             self.handle(message)
-#         return handle
-#
-#
-# class BaseHandler(TelegramHandler):
-#     def __init__(self, message):
-#         self.user = get_user(message)
-#         super().__init__(message)
-#
-#     @classmethod
-#     def get_handler(cls):
-#         handler = super().get_handler()
-#         return botan_track(handler)
-
-# class LearnWordsHandler(BaseHandler):
-#     @atomic()
-#     def handle(self, message: telebot.types.Message):
-#         self.user.update_status(User.Status.LEARNING)
-#         send_message(
-#             self.user, 'Изучать слова это здоворо! Приступим!' + constants.Emogies.astronaut,
-#         )
-#         self.user.learning_status.repeat_words.clear()
-#         LearningWord.choice_next_word(self.user)
-#
-#
-# LearnWordsHandler.set_handler(bot, command=constants.Handlers.learn_words.handler)
+def request_logger(func):
+    def wrap(message):
+        logger.info(
+            'Received message by handler=%s chat_id=%s text=%s',
+            func.__name__, message.chat.id, safe_str(message.text),
+        )
+        func(message)
+    return wrap

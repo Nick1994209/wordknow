@@ -6,11 +6,10 @@ from django.conf import settings
 from django.db.transaction import atomic
 
 from app.models import User, Word
-from telegram.utils import send_message
+from telegram.utils import send_message, request_logger
 
 from . import constants
 from .bot import bot
-from .botan import botan_track
 from .statuses_runners import LearnWordRunner, RepeatWord, get_learn_repeat_markup
 from .utils import get_user
 
@@ -30,7 +29,7 @@ def start():
 
 
 @bot.message_handler(commands=['start', constants.Handlers.help.handler, 'go'])
-@botan_track
+@request_logger
 def start_handler(message: telebot.types.Message):
     message_resp = 'Добро пожаловать! Для изучения английских слов вам поможет бот {} {}'.format(
         settings.TELEGRAM_BOT_NAME, constants.Emogies.wink
@@ -48,21 +47,21 @@ def start_handler(message: telebot.types.Message):
 
 
 @bot.message_handler(commands=[constants.Handlers.learn_words.handler])
-@botan_track
+@request_logger
 def learn_words_handler(message: telebot.types.Message):
     user = get_user(message)
     LearnWordRunner(message=message, user=user).first_run()
 
 
 @bot.message_handler(commands=[constants.Handlers.repetition.handler])
-@botan_track
+@request_logger
 def repeat_words_handler(message: telebot.types.Message):
     user = get_user(message)
     RepeatWord(message=message, user=user).first_run()
 
 
 @bot.message_handler(commands=[constants.Handlers.delete_word.handler])
-@botan_track
+@request_logger
 def delete_word_handler(message: telebot.types.Message):
     user = get_user(message)
 
@@ -81,7 +80,7 @@ def delete_word_handler(message: telebot.types.Message):
 
 
 @bot.message_handler(commands=[constants.Handlers.stop.handler])
-@botan_track
+@request_logger
 @atomic
 def stop_handler(message: telebot.types.Message):
     user = get_user(message)
@@ -93,7 +92,7 @@ def stop_handler(message: telebot.types.Message):
 
 
 @bot.message_handler(content_types=["text"])
-@botan_track
+@request_logger
 def text_handler(message: telebot.types.Message):
     user = get_user(message)
     if user.is_free:
