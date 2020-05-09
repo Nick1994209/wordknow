@@ -5,7 +5,7 @@ class Handlers:
     Handler = namedtuple('Handler', ('handler', 'path'))
     learn_words = Handler('learn_words', '/learn_words')
     repetition = Handler('repetition', '/repetition')
-    delete_word = Handler('delete_word', '/delete_word')
+    stop_learning_word = Handler('stop_learning_word', '/stop_learning_word')
     stop = Handler('stop', '/stop')
     help = Handler('help', '/help')
 

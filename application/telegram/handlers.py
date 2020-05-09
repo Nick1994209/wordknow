@@ -60,9 +60,9 @@ def repeat_words_handler(message: telebot.types.Message):
     RepeatWord(message=message, user=user).first_run()
 
 
-@bot.message_handler(commands=[constants.Handlers.delete_word.handler])
+@bot.message_handler(commands=[constants.Handlers.stop_learning_word.handler])
 @request_logger
-def delete_word_handler(message: telebot.types.Message):
+def stop_learning_word_handler(message: telebot.types.Message):
     user = get_user(message)
 
     if not user.is_repetition:
@@ -73,8 +73,8 @@ def delete_word_handler(message: telebot.types.Message):
         user.update_status(User.Status.FREE)
 
         send_message(user, '  Прощай "%s".' % word_status.word)
-        word_status.delete()
-        logger.info(f'word_status=%s was deleted', word_status)
+        word_status.stop_learning()
+        logger.info(f'word_status=%s was stopped learning', word_status)
 
     RepeatWord(message=message, user=user).first_run()
 

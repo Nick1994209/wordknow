@@ -152,7 +152,10 @@ class WordStatus(CreatedUpdateBaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='learned_words')
     word = models.ForeignKey(Word, on_delete=models.CASCADE, related_name='learned_words')
     start_repetition_time = models.DateTimeField(
-        null=True, blank=True, verbose_name='Время когда нужно будет повторить слово')
+        null=True, blank=True,
+        verbose_name='Время когда нужно будет повторить слово',
+        help_text='Если стоит None -> слово уже повторили',
+    )
     count_repetitions = models.IntegerField(default=0, verbose_name='Количество повторений слова')
     number_not_guess = models.IntegerField(default=0, verbose_name='Сколько раз не угадал слово')
 
@@ -175,7 +178,7 @@ class WordStatus(CreatedUpdateBaseModel):
         if next_repetition_time:
             self.start_repetition_time = from_time + next_repetition_time
         else:
-            self.start_repetition_time = None
+            self.stop_learning(save=False)
         self.save(update_fields=('count_repetitions', 'start_repetition_time'))
 
         logger.debug(
@@ -183,6 +186,11 @@ class WordStatus(CreatedUpdateBaseModel):
             self.user_id, safe_str(str(self.word)),
             self.count_repetitions, self.start_repetition_time,
         )
+
+    def stop_learning(self, save=True):
+        self.start_repetition_time = None
+        if save:
+            self.save(update_fields=('start_repetition_time', ))
 
     @property
     def is_conversely(self):

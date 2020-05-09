@@ -187,7 +187,7 @@ class RepeatWord(BaseRunner):
             self.user,
             f'> {word_for_translating}',
             generate_markup(
-                constants.Handlers.delete_word.path,
+                constants.Handlers.stop_learning_word.path,
                 constants.Handlers.stop.path,
                 constants.Handlers.help.path,
             ),
@@ -211,6 +211,6 @@ class RepeatWord(BaseRunner):
         )
         send_message(self.user, text, parse_mode='markdown')
         send_message(
-            self.user, f' Вы можете удалить это слово: {constants.Handlers.delete_word.path}',
+            self.user, f' Вы можете удалить это слово: {constants.Handlers.stop_learning_word.path}',
         )
         return False
