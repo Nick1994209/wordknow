@@ -10,6 +10,8 @@ class Translation(pydantic.BaseModel):
 
 class Meanings(pydantic.BaseModel):
     sound_url: Optional[str] = pydantic.Field(..., alias='soundUrl')
+    image_url: Optional[str] = pydantic.Field(..., alias='imageUrl')
+    preview_url: Optional[str] = pydantic.Field(..., alias='previewUrl')
     translation: Translation
 
 
@@ -21,6 +23,11 @@ class Word(pydantic.BaseModel):
         for meaning in self.meanings:
             if meaning.sound_url is not None:
                 return f'https:{meaning.sound_url}'
+
+    def get_image_url(self) -> Optional[str]:
+        for meaning in self.meanings:
+            if meaning.preview_url is not None:
+                return f'https:{meaning.image_url}'
 
 
 class WordList(pydantic.BaseModel):

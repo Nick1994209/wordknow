@@ -131,7 +131,7 @@ class Word(CreatedUpdateBaseModel):
         phrase = self.phrase.replace('*', ' ').replace('_', ' ')
         return text + f'\n_* {phrase} *_'  # set italic phrase
 
-    def get_word_sound(self) -> typing.Optional[typing.Tuple[str, str]]:
+    def find_word_in_skyeng_dict(self) -> typing.Optional[skyeng_schemas.Word]:
         eng_word = None
         if settings.LANG_DICT['en'].check(self.text):
             eng_word = self.text
@@ -142,13 +142,10 @@ class Word(CreatedUpdateBaseModel):
 
         eng_word: typing.cast(str, eng_word)
         try:
-            eng_word_list = SkyengClient().search_word_meaning(eng_word)
+            eng_word_meaning = SkyengClient().search_word_meanings(eng_word)
         except ClientException:
             return None
-        word = eng_word_list.get_first_word_with_sound()
-        if word:
-            return word.text, word.get_sound_url()
-        return None
+        return eng_word_meaning.get_first_word_with_sound()
 
 
 class WordStatus(CreatedUpdateBaseModel):

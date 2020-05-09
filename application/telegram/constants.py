@@ -21,3 +21,5 @@ class Emogies:
     astonished = '\U0001F632'  # ':astonished:'
     wink = '\U0001F609'  # ':wink:'  # подмигивание
     fearful = '\U0001F628'  # ':fearful:'
+    headphones = '🎧'
+    picture = '🖼'

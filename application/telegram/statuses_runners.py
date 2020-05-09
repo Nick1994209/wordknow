@@ -74,20 +74,38 @@ class LearnWordRunner(BaseRunner):
             )
             return
 
-        commands = (constants.Commands.learn, constants.Commands.miss, constants.Handlers.stop.path)
+        commands = (
+            constants.Commands.learn, constants.Commands.miss, constants.Handlers.stop.path,
+        )
         send_message(
             self.user,
             word.learning_text_markdown,
             markup=generate_markup(*commands),
             parse_mode='markdown',
         )
+        self.send_word_sound_data(word, commands)
 
-        sound_data = word.get_word_sound()
-        if sound_data:
-            text, url = sound_data
+    def send_word_sound_data(self, word, commands):
+        word_data = word.find_word_in_skyeng_dict()
+        if not word_data:
+            return
+
+        audio_message = (
+            f'<a href="{word_data.get_sound_url()}"><i>'
+            f'{constants.Emogies.headphones}: {word_data.text}'
+            f'</i></a>'
+        )
+        send_message(
+            self.user, audio_message,
+            markup=generate_markup(*commands),
+            parse_mode='html',
+        )
+
+        image_url = word_data.get_image_url()
+        if image_url:
             send_message(
                 self.user,
-                f'<a href="{url}"><i>{text}</i></a>',
+                f'<a href="{image_url}"><i>{constants.Emogies.picture}</i></a>',
                 markup=generate_markup(*commands),
                 parse_mode='html',
             )
@@ -112,7 +130,8 @@ class LearnWordRunner(BaseRunner):
             send_message(
                 self.user, 'Не понятное сообщение. Вы хотите выучить слово?',
                 markup=generate_markup(
-                    constants.Commands.learn, constants.Commands.miss, constants.Handlers.stop.path,
+                    constants.Commands.learn, constants.Commands.miss,
+                    constants.Handlers.stop.path,
                 ),
             )
             return False
