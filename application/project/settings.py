@@ -182,8 +182,9 @@ LOGGING = {
 
 REPETITION_TIMES = {
     1: timedelta(hours=1),
-    2: timedelta(days=1),
-    3: timedelta(days=3),
+    2: timedelta(days=6),
+    3: timedelta(days=1),
+    4: timedelta(days=3),
 }
 
 # retry connect to db
