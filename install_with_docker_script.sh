@@ -34,7 +34,7 @@ set -o xtrace
 test -e ~/.ssh/id_rsa.pub
 
 apt-get update
-apt-get install git nano docker docker-compose -y
+apt-get install git nano docker.io docker-compose -y
 
 mkdir /code
 cd /code
