@@ -35,6 +35,8 @@ test -e ~/.ssh/id_rsa.pub
 
 apt-get update
 apt-get install git nano docker.io docker-compose -y
+# docker-compose version must be > 1.21
+# sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 
 mkdir /code
 cd /code
