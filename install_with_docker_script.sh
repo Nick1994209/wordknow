@@ -73,4 +73,5 @@ BOT_SITE_URL="http://$SERVER_IP"
 # https_proxy=host:port
 " >> ./.env
 
-nohup docker-compose up &
+sudo systemctl enable docker
+docker-compose up --detach
