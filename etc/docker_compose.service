@@ -1,0 +1,17 @@
+# /etc/systemd/system/docker-compose-wordknow.service
+
+[Unit]
+Description=Docker Compose For Wordknow
+Requires=docker.service
+After=docker.service
+
+[Service]
+WorkingDirectory=/code/wordknow
+RuntimeDirectoryMode=755
+ExecStart=/usr/local/bin/docker-compose up
+ExecStop=/usr/local/bin/docker-compose down
+TimeoutStartSec=60
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

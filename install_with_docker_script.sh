@@ -74,4 +74,8 @@ BOT_SITE_URL="http://$SERVER_IP"
 " >> ./.env
 
 sudo systemctl enable docker
-docker-compose up --detach
+cp /code/wordknow/etc/docker_compose.service \
+  /etc/systemd/system/docker-compose-wordknow.service
+systemctl enable docker-compose-wordknow
+# journalctl -u docker-compose-wordknow.service
+

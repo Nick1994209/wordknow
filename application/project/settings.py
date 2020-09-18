@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
-
+import logging
 import os
 from datetime import timedelta
 
@@ -105,8 +105,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_FILES_BASE_DIR = os.environ.get('STATIC_FILES_BASE_DIR', '/app_static_files/')
-STATIC_ROOT = os.path.join(STATIC_FILES_BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = '/media/'
+
 LOGS_PATH = os.environ.get('LOGS_PATH', 'logs')
 if not os.path.exists(LOGS_PATH):
     os.mkdir(LOGS_PATH)
@@ -177,6 +180,7 @@ LOGGING = {
             'handlers': ['console', 'telegram_handlers'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
         },
+        'urllib3': {'level': logging.INFO},
     },
 }
 
