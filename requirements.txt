@@ -14,12 +14,12 @@ gTTS==1.2.2
       certifi==2019.6.16
       chardet==3.0.4
       idna==2.8
-      urllib3==1.25.3
+      urllib3==1.26.5
   requests==2.22.0
     certifi==2019.6.16
     chardet==3.0.4
     idna==2.8
-    urllib3==1.25.3
+    urllib3==1.26.5
   six==1.12.0
 gunicorn==19.7.1
 ipython==6.2.1
@@ -52,7 +52,7 @@ pyTelegramBotAPI==3.6.6
     certifi==2019.6.16
     chardet==3.0.4
     idna==2.8
-    urllib3==1.25.3
+    urllib3==1.26.5
   six==1.12.0
 python-dotenv==0.8.2
 schedule==0.5.0
